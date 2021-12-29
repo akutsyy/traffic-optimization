@@ -1,0 +1,3 @@
+[submodule "movsim"]
+	path = movsim
+	url = https://github.com/movsim/movsim.git
