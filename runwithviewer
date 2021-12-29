@@ -1,0 +1,5 @@
+#!/bin/bash
+
+cd "${0%/*}" # Switch to directory of script
+
+java -jar movsim/viewer/target/MovsimViewer-1.7.0-SNAPSHOT-jar-with-dependencies.jar -o movsim_output/ $@
