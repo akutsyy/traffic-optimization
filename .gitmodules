@@ -1,3 +1,6 @@
 [submodule "movsim"]
 	path = movsim
 	url = https://github.com/movsim/movsim.git
+[submodule "osm2xodr"]
+	path = osm2xodr
+	url = https://github.com/JHMeusener/osm2xodr.git
