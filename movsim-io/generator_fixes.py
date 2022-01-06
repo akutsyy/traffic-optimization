@@ -1,14 +1,12 @@
 import numpy as np
 import pyclothoids as pcloth
-
-from scenariogeneration.xodr.lane import Lane, RoadMark, LaneSection, Lanes
-from scenariogeneration.xodr.enumerations import RoadMarkType, MarkRule, ContactPoint, ElementType, ObjectType
-
-from scenariogeneration.xodr.geometry import Line, Arc, Spiral, PlanView
-from scenariogeneration.xodr.opendrive import Road, OpenDrive
-from scenariogeneration.xodr.links import Junction, Connection, _get_related_lanesection, LaneLinker
-from scenariogeneration.xodr.exceptions import GeneralIssueInputArguments
 import scenariogeneration.xodr.generators as g
+from scenariogeneration.xodr.enumerations import ContactPoint, ElementType
+from scenariogeneration.xodr.exceptions import GeneralIssueInputArguments
+from scenariogeneration.xodr.geometry import Line, PlanView
+from scenariogeneration.xodr.lane import LaneSection, Lanes
+from scenariogeneration.xodr.opendrive import Road
+
 
 def create_junction_roads(roads, angles, R, junction=1, arc_part=1 / 3, startnum=100,debug_level=0):
     """ creates all needed roads for some simple junctions, the curved parts of the junction are created as a spiral-arc-spiral combo

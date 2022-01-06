@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <OpenDRIVE>
-    <header date="2022-01-05 21:58:45.472372" east="0.0" name="myroads" north="0.0" revMajor="1" revMinor="5" south="0.0" west="0.0"/>
+    <header date="2022-01-05 21:58:45.453480" east="0.0" name="myroads" north="0.0" revMajor="1" revMinor="5" south="0.0" west="0.0"/>
     <road id="0" junction="-1" length="100" rule="RHT">
         <link>
             <successor elementId="0" elementType="junction"/>
