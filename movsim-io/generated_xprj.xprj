@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<Movsim>
+   <VehiclePrototypes>
+      <VehiclePrototypeConfiguration label="car" length="6" maximum_deceleration="9">
+         <AccelerationModelType>
+            <ModelParameterACC T="1.2" a="1.2" b="2.0" coolness="1" delta="4" s0="3" s1="2" v0="35"/>
+         </AccelerationModelType>
+         <LaneChangeModelType crit_speed_eur="20" european_rules="true">
+            <ModelParameterMOBIL minimum_gap="2.0" politeness="0.1" right_bias_acceleration="0.05" safe_deceleration="5.0" threshold_acceleration="0.1"/>
+         </LaneChangeModelType>
+      </VehiclePrototypeConfiguration>
+      <VehiclePrototypeConfiguration label="truck" length="16" maximum_deceleration="2">
+         <AccelerationModelType>
+            <ModelParameterACC T="1.2" a="1.2" b="2.0" coolness="1" delta="4" s0="3" s1="2" v0="35"/>
+         </AccelerationModelType>
+         <LaneChangeModelType crit_speed_eur="20" european_rules="true">
+            <ModelParameterMOBIL minimum_gap="2.0" politeness="0.1" right_bias_acceleration="0.05" safe_deceleration="5.0" threshold_acceleration="0.1"/>
+         </LaneChangeModelType>
+      </VehiclePrototypeConfiguration>
+   </VehiclePrototypes>
+   <Scenario network_filename="generated_road.xodr">
+      <Simulation crash_exit="false" timestep="0.2">
+         <TrafficComposition>
+            <VehicleType fraction="0.8" label="car" relative_v0_randomization="0.2"/>
+            <VehicleType fraction="0.2" label="truck" relative_v0_randomization="0.2"/>
+         </TrafficComposition>
+      </Simulation>
+   </Scenario>
+</Movsim>

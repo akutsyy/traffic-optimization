@@ -1,11 +1,13 @@
-import scenariogeneration.xodr.links
-from scenariogeneration import xodr
-from scenariogeneration import esmini
-
 import os
+import re
+import xml.etree.cElementTree as ET
+from xml.dom import minidom
+
 import numpy as np
-import generator_fixes
-import random
+from scenariogeneration import esmini
+from scenariogeneration import xodr
+
+import scenariogeneration_fixes as fixes
 
 FOURWAY = [0, np.pi / 2, np.pi, 3 * np.pi / 2]
 START = xodr.ContactPoint.start
@@ -101,94 +103,115 @@ def generate_road(roads, intersections, intersection_type="direct", filename="ge
         esmini(odr, os.path.join('esmini-linux'), car_density=5)
 
 
-def generate_circle(lanes, r, d_road, startnum):
-    sections = 4
-    short = xodr.Arc(0.5 / r, angle=3.14 / 180 * 15)
-    long = xodr.Arc(0.5 / r, angle=(360 - sections * 15) / sections * 3.14 / 180)
+def generate_roundabout(lanes, in_roads, r, d_road, startnum):
+    sections = len(in_roads)
+    lane_width = 3
     d = d_road
-    little_r = (d ** 2 + 2 * d * r) / (2 * r)
-    in_arc = xodr.Arc(0.5 / little_r, angle=np.arctan2((r + d), little_r))
-    out_arc = xodr.Arc(0.5 / little_r, angle=np.arctan2((r + d), little_r))
 
-    in_roads = []
+    exit_r = (d ** 2 + 2 * d * r) / (2 * r)
+    in_arc = xodr.Arc(0.5 / exit_r, angle=np.arctan2((r + d), exit_r))
+    out_arc = xodr.Arc(0.5 / exit_r, angle=np.arctan2((r + d), exit_r))
+
+    short_angle = np.arctan2(exit_r, r + d) * 2
+    short = xodr.Arc(0.5 / r, angle=short_angle)
+    long = xodr.Arc(0.5 / r, angle=(2 * np.pi - sections * short_angle) / sections)
+
     circle_roads = []
     junction_roads = []
     junctions = []
 
-    print("in roads")
     for i in range(sections):
-       print(i)
-       in_roads.append(xodr.create_straight_road(i))
-       in_roads[i].add_successor(xodr.ElementType.junction, i)
+        in_roads[i].add_successor(xodr.ElementType.junction, startnum + i)
 
-    print("circle roads")
     for i in range(sections):
-        circle_roads.append(xodr.create_road([long], id=startnum + i, left_lanes=lanes, right_lanes=lanes))
+        circle_roads.append(xodr.create_road([long], id=startnum + sections + i, lane_width=lane_width,
+                                             left_lanes=0, right_lanes=lanes))
         circle_roads[i].add_predecessor(xodr.ElementType.junction, startnum + i)
         circle_roads[i].add_successor(xodr.ElementType.junction, startnum + (i - 1) % sections)
-        print(startnum + i)
 
-    print("junction roads")
     for i in range(sections):
         local_joints = []
-        junction_id = i
+        junction_id = startnum + i
         # Within the roundabout
-        print(startnum + i + sections)
-        in_circle = xodr.create_road([short], id=startnum + i + sections, left_lanes=lanes, right_lanes=lanes,
-                                     road_type=junction_id)
-        in_circle.add_predecessor(xodr.ElementType.road, startnum + ((i - 1) % sections), contact_point=END)
-        in_circle.add_successor(xodr.ElementType.road, startnum + i, contact_point=START)
+        in_circle = xodr.create_road([short], id=startnum + i + 2 * sections, lane_width=lane_width,
+                                     left_lanes=0, right_lanes=lanes, road_type=junction_id)
+        in_circle.add_predecessor(xodr.ElementType.road, startnum + sections + ((i - 1) % sections), contact_point=END)
+        in_circle.add_successor(xodr.ElementType.road, startnum + sections + i, contact_point=START)
 
-        print(startnum + i + sections * 2)
         # Into the roundabout
-        in_junct = xodr.create_road([in_arc], id=startnum + i + sections * 2, left_lanes=lanes, right_lanes=lanes,
-                                    road_type=junction_id)
-        in_junct.add_successor(xodr.ElementType.road, startnum + i, contact_point=END)
+        in_junct = xodr.create_road([in_arc], id=startnum + i + sections * 3, lane_width=lane_width,
+                                    left_lanes=lanes, right_lanes=0, road_type=junction_id)
+        in_junct.add_predecessor(xodr.ElementType.road, in_roads[i].id, contact_point=END)
+        in_junct.add_successor(xodr.ElementType.road, startnum + sections + i, contact_point=END)
 
-        print(startnum + i + sections * 3)
-        print(str(startnum + ((i - 1) % sections))+"   "+str(startnum+i))
         # Out of roundabout
-        out_junct = xodr.create_road([out_arc], id=startnum + i + sections * 3, left_lanes=lanes, right_lanes=lanes,
-                                     road_type=junction_id)
-        out_junct.add_predecessor(xodr.ElementType.road, startnum + ((i - 1) % sections), contact_point=START)
-        out_junct.add_successor(xodr.ElementType.road, i, contact_point=END)
-        in_junct.add_predecessor(xodr.ElementType.road, i, contact_point=END)
+        out_junct = xodr.create_road([out_arc], id=startnum + i + sections * 4,
+                                     lane_width=lane_width, left_lanes=lanes, right_lanes=0, road_type=junction_id)
+        out_junct.add_predecessor(xodr.ElementType.road, startnum + sections + ((i - 1) % sections),
+                                  contact_point=START)
+        out_junct.add_successor(xodr.ElementType.road, in_roads[i].id, contact_point=END)
 
         local_joints.append(out_junct)
         local_joints.append(in_circle)
-
         local_joints.append(in_junct)
-
 
         junction_roads.append(local_joints)
         junctions.append(xodr.create_junction(local_joints, id=junction_id,
-                                              roads=[circle_roads[i - 1],circle_roads[i],in_roads[i]]))
+                                              roads=[circle_roads[i - 1], circle_roads[i], in_roads[i]]))
 
-    odr = xodr.OpenDrive('myroads')
-
-    for r in in_roads:
-        odr.add_road(r)
-    for r in circle_roads:
-        odr.add_road(r)
+    all_roads = circle_roads
     for j in junction_roads:
-        for r in j:
+        all_roads = all_roads + j
+
+    return all_roads,junctions
+
+def join_all(road_sets, junction_sets, filename):
+
+    odr = fixes.FixedOpenDrive('myroads')
+
+    for rs in road_sets:
+        for r in rs:
             odr.add_road(r)
+
     odr.adjust_roads_and_lanes()
+    for js in junction_sets:
+        for j in js:
+            odr.add_junction(j)
+    odr.write_xml(filename)
+    return odr
+# Download from https://github.com/esmini/esmini/releases/tag/v2.18.2
+def show_road(odr,esmini_path='esmini-linux'):
+    esmini(odr, os.path.join(esmini_path), car_density=5)
 
-    for j in junctions:
-        odr.add_junction(j)
-        print("junction "+str(j.id))
+def post_process(filename):
+    tree = ET.parse(filename)
+    root = tree.getroot()
+    def filter_attribute(element,attribute):
+        for e in root.iter(element):
+            if attribute in e.attrib:
+                e.attrib.pop(attribute)
+    def filter_element(element):
+        for child in root.findall(element):
+            root.remove(child)
 
+    filter_attribute('road','rule')
+    filter_attribute('roadMark','color')
+    filter_attribute('roadMark','sOffset')
+    filter_attribute('roadMark','type')
+    filter_attribute('roadMark','weight')
 
-    # write the OpenDRIVE file as xodr using current script name
-    odr.write_xml("circle.xodr")
-
-    # uncomment the following lines to display the road using esmini
-    # Download from https://github.com/esmini/esmini/releases/tag/v2.18.2
-    esmini(odr, os.path.join('esmini-linux'), car_density=5)
-
+    xmlstr = minidom.parseString(ET.tostring(root)).toprettyxml(indent="   ")
+    xmlstr = "\n".join([ll.rstrip() for ll in xmlstr.splitlines() if ll.strip()])
+    with open(filename, 'w') as f:
+        f.write(xmlstr)
 
 if __name__ == '__main__':
-    generate_circle(1, 10, 5, startnum=100)
-    # roads,intersections = square_grid(1,1,lanes=2)
+    in_roads = []
+    for i in range(4):
+        in_roads.append(xodr.create_straight_road(i,100))
+    roads, junctions = generate_roundabout(lanes=1, in_roads=in_roads,r=10,d_road=4, startnum=100)
+    odr = join_all([in_roads,roads],[junctions],"generated_road.xodr")
+    post_process("generated_road.xodr")
+    #show_road(odr)
+    # roads,intersections = square_grid(5,5,lanes=2)
     # generate_road(roads,intersections,intersection_type="simple",visualize=True,debug_level=0)

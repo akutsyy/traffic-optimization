@@ -1,11 +1,18 @@
 import numpy as np
 import pyclothoids as pcloth
 import scenariogeneration.xodr.generators as g
+import scenariogeneration.xodr.links as links
 from scenariogeneration.xodr.enumerations import ContactPoint, ElementType
 from scenariogeneration.xodr.exceptions import GeneralIssueInputArguments
+from scenariogeneration.xodr.opendrive import OpenDrive
 from scenariogeneration.xodr.geometry import Line, PlanView
 from scenariogeneration.xodr.lane import LaneSection, Lanes
 from scenariogeneration.xodr.opendrive import Road
+from scenariogeneration.helpers import printToFile,enum2str
+from scenariogeneration.xodr.enumerations import ElementType, ContactPoint, RoadSide, TrafficRule
+from scenariogeneration.xodr.exceptions import UndefinedRoadNetwork, RoadsAndLanesNotAdjusted
+from scenariogeneration.xodr.elevation import LateralProfile, ElevationProfile, _Poly3Profile
+from itertools import combinations
 
 
 def create_junction_roads(roads, angles, R, junction=1, arc_part=1 / 3, startnum=100,debug_level=0):
@@ -104,3 +111,96 @@ def create_junction_roads(roads, angles, R, junction=1, arc_part=1 / 3, startnum
         roads[-1].add_predecessor(ElementType.junction, junction)
 
     return junction_roads
+
+class FixedOpenDrive(OpenDrive):
+    def __init__(self, name, revMajor='1', revMinor='5'):
+        OpenDrive.__init__(self, name, revMajor, revMinor)
+
+    def adjust_roads_and_lanes(self):
+        """ Adjust starting position of all geometries of all roads and try to link all lanes in neighbouring roads
+
+            Parameters
+            ----------
+
+        """
+        #adjust roads and their geometries
+        self.adjust_startpoints()
+
+        results = list(combinations(self.roads, 2))
+
+        for r in range(len(results)):
+            # print('Analyzing roads', results[r][0], 'and', results[r][1] )
+            create_lane_links(self.roads[results[r][0]],self.roads[results[r][1]])
+
+
+def create_lane_links(road1, road2):
+    """ create_lane_links takes two roads and if they are connected, match their lanes
+        and creates lane links.
+        NOTE: now only works for roads/connecting roads with the same amount of lanes
+
+        Parameters
+        ----------
+            road1 (Road): first road to be lane linked
+
+            road2 (Road): second road to be lane linked
+    """
+    if road1.road_type == -1 and road2.road_type == -1:
+        # both are roads
+        if links.are_roads_consecutive(road1, road2):
+            links._create_links_roads(road1, road2)
+        elif links.are_roads_consecutive(road2, road1):
+            links._create_links_roads(road2, road1)
+        else:
+            connected, connectiontype = links.are_roads_connected(road1, road2)
+            if connected:
+                links._create_links_roads(road1, road2, connectiontype)
+
+    elif road1.road_type != -1:
+        _create_links_connecting_road(road1, road2)
+    elif road2.road_type != -1:
+        _create_links_connecting_road(road2, road1)
+
+
+def _create_links_connecting_road(connecting, road):
+    """ _create_links_connecting_road will create lane links between a connecting road and a normal road
+
+        Parameters
+        ----------
+            connecting (Road): a road of type connecting road (not -1)
+
+            road (Road): a that connects to the connecting road
+
+    """
+    linktype, sign, connecting_lanesec = links._get_related_lanesection(connecting, road)
+    _, _, road_lanesection_id = links._get_related_lanesection(road, connecting)
+
+    if connecting_lanesec != None:
+        if connecting.lanes.lanesections[connecting_lanesec].leftlanes:
+            # do left lanes
+            for i in range(len(connecting.lanes.lanesections[road_lanesection_id].leftlanes)):
+                if len(connecting.lanes.lanesections[road_lanesection_id].leftlanes) \
+                        == len(road.lanes.lanesections[road_lanesection_id].leftlanes):
+                    linkid = road.lanes.lanesections[road_lanesection_id].leftlanes[i].lane_id * sign
+                else:
+                    linkid = road.lanes.lanesections[road_lanesection_id].rightlanes[i].lane_id * sign
+
+                if linktype == 'predecessor':
+                    linkid += connecting.lane_offset_pred
+                else:
+                    linkid += connecting.lane_offset_suc
+                connecting.lanes.lanesections[connecting_lanesec].leftlanes[i].add_link(linktype, linkid)
+
+
+        if connecting.lanes.lanesections[connecting_lanesec].rightlanes:
+            # do right lanes
+            for i in range(len(connecting.lanes.lanesections[connecting_lanesec].rightlanes)):
+                if len(connecting.lanes.lanesections[road_lanesection_id].rightlanes) \
+                        == len(road.lanes.lanesections[road_lanesection_id].rightlanes):
+                    linkid = road.lanes.lanesections[road_lanesection_id].rightlanes[i].lane_id * sign
+                else:
+                    linkid = road.lanes.lanesections[road_lanesection_id].leftlanes[i].lane_id * sign
+                if linktype == 'predecessor':
+                    linkid += connecting.lane_offset_pred
+                else:
+                    linkid += connecting.lane_offset_suc
+                connecting.lanes.lanesections[connecting_lanesec].rightlanes[i].add_link(linktype, linkid)

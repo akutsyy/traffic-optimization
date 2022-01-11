@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <OpenDRIVE>
-    <header date="2022-01-05 21:58:45.472372" east="0.0" name="myroads" north="0.0" revMajor="1" revMinor="5" south="0.0" west="0.0"/>
+    <header date="2022-01-10 20:28:24.295870" east="0.0" name="myroads" north="0.0" revMajor="1" revMinor="5" south="0.0" west="0.0"/>
     <road id="0" junction="-1" length="100" rule="RHT">
         <link>
-            <successor elementId="0" elementType="junction"/>
+            <successor elementId="100" elementType="junction"/>
         </link>
         <planView>
             <geometry hdg="0" length="100" s="0" x="0" y="0">
@@ -38,10 +38,10 @@
     </road>
     <road id="1" junction="-1" length="100" rule="RHT">
         <link>
-            <successor elementId="1" elementType="junction"/>
+            <successor elementId="101" elementType="junction"/>
         </link>
         <planView>
-            <geometry hdg="14.136370614359175" length="100" s="0" x="129.89647752760484" y="-129.9999587811385">
+            <geometry hdg="14.137166941154069" length="100" s="0" x="127.99999999999996" y="-128.0">
                 <line/>
             </geometry>
         </planView>
@@ -73,10 +73,10 @@
     </road>
     <road id="2" junction="-1" length="100" rule="RHT">
         <link>
-            <successor elementId="2" elementType="junction"/>
+            <successor elementId="102" elementType="junction"/>
         </link>
         <planView>
-            <geometry hdg="15.706370614359175" length="100" s="0" x="259.99983512458016" y="-0.20704487914307163">
+            <geometry hdg="15.707963267948966" length="100" s="0" x="256.0" y="-5.253858564469463e-14">
                 <line/>
             </geometry>
         </planView>
@@ -108,10 +108,10 @@
     </road>
     <road id="3" junction="-1" length="100" rule="RHT">
         <link>
-            <successor elementId="3" elementType="junction"/>
+            <successor elementId="103" elementType="junction"/>
         </link>
         <planView>
-            <geometry hdg="17.276370614359173" length="100" s="0" x="130.31056715459636" y="129.99962903040333">
+            <geometry hdg="17.27875959474386" length="100" s="0" x="128.00000000000003" y="128.0">
                 <line/>
             </geometry>
         </planView>
@@ -141,13 +141,13 @@
             </laneSection>
         </lanes>
     </road>
-    <road id="100" junction="-1" length="26.16666666666667" rule="RHT">
+    <road id="104" junction="-1" length="18.204032342727785" rule="RHT">
         <link>
             <predecessor elementId="100" elementType="junction"/>
             <successor elementId="103" elementType="junction"/>
         </link>
         <planView>
-            <geometry hdg="6.677180100084452" length="26.16666666666667" s="0" x="137.67760383712366" y="-18.467658198054888">
+            <geometry hdg="6.61348266200884" length="18.204032342727785" s="0" x="134.48648648648648" y="-18.91891891891892">
                 <arc curvature="0.05"/>
             </geometry>
         </planView>
@@ -155,13 +155,6 @@
         <lateralProfile/>
         <lanes>
             <laneSection s="0">
-                <left>
-                    <lane id="1" level="false" type="driving">
-                        <link/>
-                        <width a="3" b="0" c="0" d="0" sOffset="0"/>
-                        <roadMark color="standard" height="0.02" sOffset="0" type="solid" weight="standard" width="0.2"/>
-                    </lane>
-                </left>
                 <center>
                     <lane id="0" level="false" type="none">
                         <roadMark color="standard" height="0.02" sOffset="0" type="solid" weight="standard" width="0.2"/>
@@ -177,13 +170,13 @@
             </laneSection>
         </lanes>
     </road>
-    <road id="101" junction="-1" length="26.16666666666667" rule="RHT">
+    <road id="105" junction="-1" length="18.204032342727785" rule="RHT">
         <link>
             <predecessor elementId="101" elementType="junction"/>
             <successor elementId="100" elementType="junction"/>
         </link>
         <planView>
-            <geometry hdg="8.247180100084453" length="26.16666666666667" s="0" x="148.47376622355833" y="7.6628951132921">
+            <geometry hdg="8.184278988803737" length="18.204032342727785" s="0" x="146.9189189189189" y="6.486486486486484">
                 <arc curvature="0.05"/>
             </geometry>
         </planView>
@@ -191,13 +184,6 @@
         <lateralProfile/>
         <lanes>
             <laneSection s="0">
-                <left>
-                    <lane id="1" level="false" type="driving">
-                        <link/>
-                        <width a="3" b="0" c="0" d="0" sOffset="0"/>
-                        <roadMark color="standard" height="0.02" sOffset="0" type="solid" weight="standard" width="0.2"/>
-                    </lane>
-                </left>
                 <center>
                     <lane id="0" level="false" type="none">
                         <roadMark color="standard" height="0.02" sOffset="0" type="solid" weight="standard" width="0.2"/>
@@ -213,13 +199,13 @@
             </laneSection>
         </lanes>
     </road>
-    <road id="102" junction="-1" length="26.16666666666667" rule="RHT">
+    <road id="106" junction="-1" length="18.204032342727785" rule="RHT">
         <link>
             <predecessor elementId="102" elementType="junction"/>
             <successor elementId="101" elementType="junction"/>
         </link>
         <planView>
-            <geometry hdg="9.817180100084453" length="26.16666666666667" s="0" x="122.35181846985967" y="18.479862534175393">
+            <geometry hdg="9.755075315598633" length="18.204032342727785" s="0" x="121.5135135135135" y="18.91891891891892">
                 <arc curvature="0.05"/>
             </geometry>
         </planView>
@@ -227,13 +213,6 @@
         <lateralProfile/>
         <lanes>
             <laneSection s="0">
-                <left>
-                    <lane id="1" level="false" type="driving">
-                        <link/>
-                        <width a="3" b="0" c="0" d="0" sOffset="0"/>
-                        <roadMark color="standard" height="0.02" sOffset="0" type="solid" weight="standard" width="0.2"/>
-                    </lane>
-                </left>
                 <center>
                     <lane id="0" level="false" type="none">
                         <roadMark color="standard" height="0.02" sOffset="0" type="solid" weight="standard" width="0.2"/>
@@ -249,13 +228,13 @@
             </laneSection>
         </lanes>
     </road>
-    <road id="103" junction="-1" length="26.16666666666667" rule="RHT">
+    <road id="107" junction="-1" length="18.204032342727785" rule="RHT">
         <link>
             <predecessor elementId="103" elementType="junction"/>
             <successor elementId="102" elementType="junction"/>
         </link>
         <planView>
-            <geometry hdg="5.1071801000844514" length="26.16666666666667" s="0" x="111.53846153846153" y="-7.692307692307692">
+            <geometry hdg="5.0426863352139435" length="18.204032342727785" s="0" x="109.08108108108108" y="-6.486486486486488">
                 <arc curvature="0.05"/>
             </geometry>
         </planView>
@@ -263,13 +242,6 @@
         <lateralProfile/>
         <lanes>
             <laneSection s="0">
-                <left>
-                    <lane id="1" level="false" type="driving">
-                        <link/>
-                        <width a="3" b="0" c="0" d="0" sOffset="0"/>
-                        <roadMark color="standard" height="0.02" sOffset="0" type="solid" weight="standard" width="0.2"/>
-                    </lane>
-                </left>
                 <center>
                     <lane id="0" level="false" type="none">
                         <roadMark color="standard" height="0.02" sOffset="0" type="solid" weight="standard" width="0.2"/>
@@ -285,14 +257,14 @@
             </laneSection>
         </lanes>
     </road>
-    <road id="112" junction="0" length="14.700065088689188" rule="RHT">
+    <road id="116" junction="100" length="11.908790130870171" rule="RHT">
         <link>
-            <predecessor contactPoint="start" elementId="103" elementType="road"/>
+            <predecessor contactPoint="start" elementId="107" elementType="road"/>
             <successor contactPoint="end" elementId="0" elementType="road"/>
         </link>
         <planView>
-            <geometry hdg="1.965587446494658" length="14.700065088689188" s="0" x="111.53846153846153" y="-7.692307692307692">
-                <arc curvature="0.08"/>
+            <geometry hdg="1.9010936816241502" length="11.908790130870171" s="0" x="109.08108108108108" y="-6.486486486486488">
+                <arc curvature="0.10416666666666667"/>
             </geometry>
         </planView>
         <elevationProfile/>
@@ -303,7 +275,7 @@
                     <lane id="1" level="false" type="driving">
                         <link>
                             <successor id="-1"/>
-                            <predecessor id="-1"/>
+                            <predecessor id="1"/>
                         </link>
                         <width a="3" b="0" c="0" d="0" sOffset="0"/>
                         <roadMark color="standard" height="0.02" sOffset="0" type="solid" weight="standard" width="0.2"/>
@@ -314,26 +286,16 @@
                         <roadMark color="standard" height="0.02" sOffset="0" type="solid" weight="standard" width="0.2"/>
                     </lane>
                 </center>
-                <right>
-                    <lane id="-1" level="false" type="driving">
-                        <link>
-                            <successor id="1"/>
-                            <predecessor id="1"/>
-                        </link>
-                        <width a="3" b="0" c="0" d="0" sOffset="0"/>
-                        <roadMark color="standard" height="0.02" sOffset="0" type="solid" weight="standard" width="0.2"/>
-                    </lane>
-                </right>
             </laneSection>
         </lanes>
     </road>
-    <road id="104" junction="0" length="5.233333333333334" rule="RHT">
+    <road id="108" junction="100" length="13.211894193170146" rule="RHT">
         <link>
-            <predecessor contactPoint="end" elementId="103" elementType="road"/>
-            <successor contactPoint="start" elementId="100" elementType="road"/>
+            <predecessor contactPoint="end" elementId="107" elementType="road"/>
+            <successor contactPoint="start" elementId="104" elementType="road"/>
         </link>
         <planView>
-            <geometry hdg="6.415513433417785" length="5.233333333333334" s="0" x="132.63884540952708" y="-19.82514804243887">
+            <geometry hdg="5.952887952350332" length="13.211894193170146" s="0" x="121.5135135135135" y="-18.918918918918916">
                 <arc curvature="0.05"/>
             </geometry>
         </planView>
@@ -341,16 +303,6 @@
         <lateralProfile/>
         <lanes>
             <laneSection s="0">
-                <left>
-                    <lane id="1" level="false" type="driving">
-                        <link>
-                            <successor id="1"/>
-                            <predecessor id="1"/>
-                        </link>
-                        <width a="3" b="0" c="0" d="0" sOffset="0"/>
-                        <roadMark color="standard" height="0.02" sOffset="0" type="solid" weight="standard" width="0.2"/>
-                    </lane>
-                </left>
                 <center>
                     <lane id="0" level="false" type="none">
                         <roadMark color="standard" height="0.02" sOffset="0" type="solid" weight="standard" width="0.2"/>
@@ -369,14 +321,14 @@
             </laneSection>
         </lanes>
     </road>
-    <road id="108" junction="0" length="14.700065088689188" rule="RHT">
+    <road id="112" junction="100" length="11.908790130870171" rule="RHT">
         <link>
-            <successor contactPoint="end" elementId="100" elementType="road"/>
             <predecessor contactPoint="end" elementId="0" elementType="road"/>
+            <successor contactPoint="end" elementId="104" elementType="road"/>
         </link>
         <planView>
-            <geometry hdg="0" length="14.700065088689188" s="0" x="100.0" y="0.0">
-                <arc curvature="0.08"/>
+            <geometry hdg="0" length="11.908790130870171" s="0" x="100.0" y="0.0">
+                <arc curvature="0.10416666666666667"/>
             </geometry>
         </planView>
         <elevationProfile/>
@@ -387,7 +339,7 @@
                     <lane id="1" level="false" type="driving">
                         <link>
                             <predecessor id="1"/>
-                            <successor id="-1"/>
+                            <successor id="1"/>
                         </link>
                         <width a="3" b="0" c="0" d="0" sOffset="0"/>
                         <roadMark color="standard" height="0.02" sOffset="0" type="solid" weight="standard" width="0.2"/>
@@ -398,27 +350,17 @@
                         <roadMark color="standard" height="0.02" sOffset="0" type="solid" weight="standard" width="0.2"/>
                     </lane>
                 </center>
-                <right>
-                    <lane id="-1" level="false" type="driving">
-                        <link>
-                            <predecessor id="-1"/>
-                            <successor id="1"/>
-                        </link>
-                        <width a="3" b="0" c="0" d="0" sOffset="0"/>
-                        <roadMark color="standard" height="0.02" sOffset="0" type="solid" weight="standard" width="0.2"/>
-                    </lane>
-                </right>
             </laneSection>
         </lanes>
     </road>
-    <road id="113" junction="1" length="14.700065088689188" rule="RHT">
+    <road id="117" junction="101" length="11.908790130870171" rule="RHT">
         <link>
-            <predecessor contactPoint="start" elementId="100" elementType="road"/>
+            <predecessor contactPoint="start" elementId="104" elementType="road"/>
             <successor contactPoint="end" elementId="1" elementType="road"/>
         </link>
         <planView>
-            <geometry hdg="9.818772753674246" length="14.700065088689188" s="0" x="137.67760383712366" y="-18.467658198054888">
-                <arc curvature="0.08"/>
+            <geometry hdg="9.755075315598633" length="11.908790130870171" s="0" x="134.48648648648648" y="-18.91891891891892">
+                <arc curvature="0.10416666666666667"/>
             </geometry>
         </planView>
         <elevationProfile/>
@@ -429,7 +371,7 @@
                     <lane id="1" level="false" type="driving">
                         <link>
                             <successor id="-1"/>
-                            <predecessor id="-1"/>
+                            <predecessor id="1"/>
                         </link>
                         <width a="3" b="0" c="0" d="0" sOffset="0"/>
                         <roadMark color="standard" height="0.02" sOffset="0" type="solid" weight="standard" width="0.2"/>
@@ -440,26 +382,16 @@
                         <roadMark color="standard" height="0.02" sOffset="0" type="solid" weight="standard" width="0.2"/>
                     </lane>
                 </center>
-                <right>
-                    <lane id="-1" level="false" type="driving">
-                        <link>
-                            <successor id="1"/>
-                            <predecessor id="1"/>
-                        </link>
-                        <width a="3" b="0" c="0" d="0" sOffset="0"/>
-                        <roadMark color="standard" height="0.02" sOffset="0" type="solid" weight="standard" width="0.2"/>
-                    </lane>
-                </right>
             </laneSection>
         </lanes>
     </road>
-    <road id="105" junction="1" length="5.233333333333334" rule="RHT">
+    <road id="109" junction="101" length="13.211894193170146" rule="RHT">
         <link>
-            <predecessor contactPoint="end" elementId="100" elementType="road"/>
-            <successor contactPoint="start" elementId="101" elementType="road"/>
+            <predecessor contactPoint="end" elementId="104" elementType="road"/>
+            <successor contactPoint="start" elementId="105" elementType="road"/>
         </link>
         <planView>
-            <geometry hdg="7.985513433417785" length="5.233333333333334" s="0" x="149.82724313960065" y="2.623057277902788">
+            <geometry hdg="7.523684279145229" length="13.211894193170146" s="0" x="146.9189189189189" y="-6.486486486486493">
                 <arc curvature="0.05"/>
             </geometry>
         </planView>
@@ -467,16 +399,6 @@
         <lateralProfile/>
         <lanes>
             <laneSection s="0">
-                <left>
-                    <lane id="1" level="false" type="driving">
-                        <link>
-                            <predecessor id="1"/>
-                            <successor id="1"/>
-                        </link>
-                        <width a="3" b="0" c="0" d="0" sOffset="0"/>
-                        <roadMark color="standard" height="0.02" sOffset="0" type="solid" weight="standard" width="0.2"/>
-                    </lane>
-                </left>
                 <center>
                     <lane id="0" level="false" type="none">
                         <roadMark color="standard" height="0.02" sOffset="0" type="solid" weight="standard" width="0.2"/>
@@ -495,14 +417,14 @@
             </laneSection>
         </lanes>
     </road>
-    <road id="109" junction="1" length="14.700065088689188" rule="RHT">
+    <road id="113" junction="101" length="11.908790130870171" rule="RHT">
         <link>
-            <successor contactPoint="end" elementId="101" elementType="road"/>
             <predecessor contactPoint="end" elementId="1" elementType="road"/>
+            <successor contactPoint="end" elementId="105" elementType="road"/>
         </link>
         <planView>
-            <geometry hdg="14.136370614359175" length="14.700065088689188" s="0" x="129.97611019867801" y="-29.999990487955046">
-                <arc curvature="0.08"/>
+            <geometry hdg="14.137166941154069" length="11.908790130870171" s="0" x="128.0" y="-27.999999999999996">
+                <arc curvature="0.10416666666666667"/>
             </geometry>
         </planView>
         <elevationProfile/>
@@ -513,7 +435,7 @@
                     <lane id="1" level="false" type="driving">
                         <link>
                             <predecessor id="1"/>
-                            <successor id="-1"/>
+                            <successor id="1"/>
                         </link>
                         <width a="3" b="0" c="0" d="0" sOffset="0"/>
                         <roadMark color="standard" height="0.02" sOffset="0" type="solid" weight="standard" width="0.2"/>
@@ -524,27 +446,17 @@
                         <roadMark color="standard" height="0.02" sOffset="0" type="solid" weight="standard" width="0.2"/>
                     </lane>
                 </center>
-                <right>
-                    <lane id="-1" level="false" type="driving">
-                        <link>
-                            <predecessor id="-1"/>
-                            <successor id="1"/>
-                        </link>
-                        <width a="3" b="0" c="0" d="0" sOffset="0"/>
-                        <roadMark color="standard" height="0.02" sOffset="0" type="solid" weight="standard" width="0.2"/>
-                    </lane>
-                </right>
             </laneSection>
         </lanes>
     </road>
-    <road id="114" junction="2" length="14.700065088689188" rule="RHT">
+    <road id="118" junction="102" length="11.908790130870171" rule="RHT">
         <link>
-            <predecessor contactPoint="start" elementId="101" elementType="road"/>
+            <predecessor contactPoint="start" elementId="105" elementType="road"/>
             <successor contactPoint="end" elementId="2" elementType="road"/>
         </link>
         <planView>
-            <geometry hdg="11.388772753674246" length="14.700065088689188" s="0" x="148.47376622355833" y="7.6628951132921">
-                <arc curvature="0.08"/>
+            <geometry hdg="11.32587164239353" length="11.908790130870171" s="0" x="146.9189189189189" y="6.486486486486484">
+                <arc curvature="0.10416666666666667"/>
             </geometry>
         </planView>
         <elevationProfile/>
@@ -555,7 +467,7 @@
                     <lane id="1" level="false" type="driving">
                         <link>
                             <successor id="-1"/>
-                            <predecessor id="-1"/>
+                            <predecessor id="1"/>
                         </link>
                         <width a="3" b="0" c="0" d="0" sOffset="0"/>
                         <roadMark color="standard" height="0.02" sOffset="0" type="solid" weight="standard" width="0.2"/>
@@ -566,26 +478,16 @@
                         <roadMark color="standard" height="0.02" sOffset="0" type="solid" weight="standard" width="0.2"/>
                     </lane>
                 </center>
-                <right>
-                    <lane id="-1" level="false" type="driving">
-                        <link>
-                            <successor id="1"/>
-                            <predecessor id="1"/>
-                        </link>
-                        <width a="3" b="0" c="0" d="0" sOffset="0"/>
-                        <roadMark color="standard" height="0.02" sOffset="0" type="solid" weight="standard" width="0.2"/>
-                    </lane>
-                </right>
             </laneSection>
         </lanes>
     </road>
-    <road id="106" junction="2" length="5.233333333333334" rule="RHT">
+    <road id="110" junction="102" length="13.211894193170146" rule="RHT">
         <link>
-            <predecessor contactPoint="end" elementId="101" elementType="road"/>
-            <successor contactPoint="start" elementId="102" elementType="road"/>
+            <predecessor contactPoint="end" elementId="105" elementType="road"/>
+            <successor contactPoint="start" elementId="106" elementType="road"/>
         </link>
         <planView>
-            <geometry hdg="9.555513433417786" length="5.233333333333334" s="0" x="127.39273251709744" y="19.82932566358721">
+            <geometry hdg="9.094480605940126" length="13.211894193170146" s="0" x="134.48648648648648" y="18.918918918918916">
                 <arc curvature="0.05"/>
             </geometry>
         </planView>
@@ -593,16 +495,6 @@
         <lateralProfile/>
         <lanes>
             <laneSection s="0">
-                <left>
-                    <lane id="1" level="false" type="driving">
-                        <link>
-                            <predecessor id="1"/>
-                            <successor id="1"/>
-                        </link>
-                        <width a="3" b="0" c="0" d="0" sOffset="0"/>
-                        <roadMark color="standard" height="0.02" sOffset="0" type="solid" weight="standard" width="0.2"/>
-                    </lane>
-                </left>
                 <center>
                     <lane id="0" level="false" type="none">
                         <roadMark color="standard" height="0.02" sOffset="0" type="solid" weight="standard" width="0.2"/>
@@ -621,14 +513,14 @@
             </laneSection>
         </lanes>
     </road>
-    <road id="110" junction="2" length="14.700065088689188" rule="RHT">
+    <road id="114" junction="102" length="11.908790130870171" rule="RHT">
         <link>
-            <successor contactPoint="end" elementId="102" elementType="road"/>
             <predecessor contactPoint="end" elementId="2" elementType="road"/>
+            <successor contactPoint="end" elementId="106" elementType="road"/>
         </link>
         <planView>
-            <geometry hdg="15.706370614359175" length="14.700065088689188" s="0" x="159.9999619518262" y="-0.047779587494574116">
-                <arc curvature="0.08"/>
+            <geometry hdg="15.707963267948966" length="11.908790130870171" s="0" x="156.0" y="-3.552713678800501e-15">
+                <arc curvature="0.10416666666666667"/>
             </geometry>
         </planView>
         <elevationProfile/>
@@ -639,7 +531,7 @@
                     <lane id="1" level="false" type="driving">
                         <link>
                             <predecessor id="1"/>
-                            <successor id="-1"/>
+                            <successor id="1"/>
                         </link>
                         <width a="3" b="0" c="0" d="0" sOffset="0"/>
                         <roadMark color="standard" height="0.02" sOffset="0" type="solid" weight="standard" width="0.2"/>
@@ -650,27 +542,17 @@
                         <roadMark color="standard" height="0.02" sOffset="0" type="solid" weight="standard" width="0.2"/>
                     </lane>
                 </center>
-                <right>
-                    <lane id="-1" level="false" type="driving">
-                        <link>
-                            <predecessor id="-1"/>
-                            <successor id="1"/>
-                        </link>
-                        <width a="3" b="0" c="0" d="0" sOffset="0"/>
-                        <roadMark color="standard" height="0.02" sOffset="0" type="solid" weight="standard" width="0.2"/>
-                    </lane>
-                </right>
             </laneSection>
         </lanes>
     </road>
-    <road id="115" junction="3" length="14.700065088689188" rule="RHT">
+    <road id="119" junction="103" length="11.908790130870171" rule="RHT">
         <link>
-            <predecessor contactPoint="start" elementId="102" elementType="road"/>
+            <predecessor contactPoint="start" elementId="106" elementType="road"/>
             <successor contactPoint="end" elementId="3" elementType="road"/>
         </link>
         <planView>
-            <geometry hdg="12.958772753674246" length="14.700065088689188" s="0" x="122.35181846985967" y="18.479862534175393">
-                <arc curvature="0.08"/>
+            <geometry hdg="12.896667969188426" length="11.908790130870171" s="0" x="121.5135135135135" y="18.91891891891892">
+                <arc curvature="0.10416666666666667"/>
             </geometry>
         </planView>
         <elevationProfile/>
@@ -681,7 +563,7 @@
                     <lane id="1" level="false" type="driving">
                         <link>
                             <successor id="-1"/>
-                            <predecessor id="-1"/>
+                            <predecessor id="1"/>
                         </link>
                         <width a="3" b="0" c="0" d="0" sOffset="0"/>
                         <roadMark color="standard" height="0.02" sOffset="0" type="solid" weight="standard" width="0.2"/>
@@ -692,26 +574,16 @@
                         <roadMark color="standard" height="0.02" sOffset="0" type="solid" weight="standard" width="0.2"/>
                     </lane>
                 </center>
-                <right>
-                    <lane id="-1" level="false" type="driving">
-                        <link>
-                            <successor id="1"/>
-                            <predecessor id="1"/>
-                        </link>
-                        <width a="3" b="0" c="0" d="0" sOffset="0"/>
-                        <roadMark color="standard" height="0.02" sOffset="0" type="solid" weight="standard" width="0.2"/>
-                    </lane>
-                </right>
             </laneSection>
         </lanes>
     </road>
-    <road id="107" junction="3" length="5.233333333333334" rule="RHT">
+    <road id="111" junction="103" length="13.211894193170146" rule="RHT">
         <link>
-            <predecessor contactPoint="end" elementId="102" elementType="road"/>
-            <successor contactPoint="start" elementId="103" elementType="road"/>
+            <predecessor contactPoint="end" elementId="106" elementType="road"/>
+            <successor contactPoint="start" elementId="107" elementType="road"/>
         </link>
         <planView>
-            <geometry hdg="11.125513433417787" length="5.233333333333334" s="0" x="110.16860438692206" y="-2.5914760345393386">
+            <geometry hdg="10.665276932735022" length="13.211894193170146" s="0" x="109.08108108108107" y="6.486486486486496">
                 <arc curvature="0.05"/>
             </geometry>
         </planView>
@@ -719,16 +591,6 @@
         <lateralProfile/>
         <lanes>
             <laneSection s="0">
-                <left>
-                    <lane id="1" level="false" type="driving">
-                        <link>
-                            <predecessor id="1"/>
-                            <successor id="1"/>
-                        </link>
-                        <width a="3" b="0" c="0" d="0" sOffset="0"/>
-                        <roadMark color="standard" height="0.02" sOffset="0" type="solid" weight="standard" width="0.2"/>
-                    </lane>
-                </left>
                 <center>
                     <lane id="0" level="false" type="none">
                         <roadMark color="standard" height="0.02" sOffset="0" type="solid" weight="standard" width="0.2"/>
@@ -747,14 +609,14 @@
             </laneSection>
         </lanes>
     </road>
-    <road id="111" junction="3" length="14.700065088689188" rule="RHT">
+    <road id="115" junction="103" length="11.908790130870171" rule="RHT">
         <link>
-            <successor contactPoint="end" elementId="103" elementType="road"/>
             <predecessor contactPoint="end" elementId="3" elementType="road"/>
+            <successor contactPoint="end" elementId="107" elementType="road"/>
         </link>
         <planView>
-            <geometry hdg="17.276370614359173" length="14.700065088689188" s="0" x="130.07166934336843" y="29.99991439163153">
-                <arc curvature="0.08"/>
+            <geometry hdg="17.27875959474386" length="11.908790130870171" s="0" x="127.99999999999999" y="27.999999999999996">
+                <arc curvature="0.10416666666666667"/>
             </geometry>
         </planView>
         <elevationProfile/>
@@ -765,7 +627,7 @@
                     <lane id="1" level="false" type="driving">
                         <link>
                             <predecessor id="1"/>
-                            <successor id="-1"/>
+                            <successor id="1"/>
                         </link>
                         <width a="3" b="0" c="0" d="0" sOffset="0"/>
                         <roadMark color="standard" height="0.02" sOffset="0" type="solid" weight="standard" width="0.2"/>
@@ -776,120 +638,86 @@
                         <roadMark color="standard" height="0.02" sOffset="0" type="solid" weight="standard" width="0.2"/>
                     </lane>
                 </center>
-                <right>
-                    <lane id="-1" level="false" type="driving">
-                        <link>
-                            <predecessor id="-1"/>
-                            <successor id="1"/>
-                        </link>
-                        <width a="3" b="0" c="0" d="0" sOffset="0"/>
-                        <roadMark color="standard" height="0.02" sOffset="0" type="solid" weight="standard" width="0.2"/>
-                    </lane>
-                </right>
             </laneSection>
         </lanes>
     </road>
-    <junction id="0" name="my junction">
-        <connection connectingRoad="112" contactPoint="end" id="0" incomingRoad="0">
-            <laneLink from="-1" to="1"/>
+    <junction id="100" name="my junction">
+        <connection connectingRoad="116" contactPoint="end" id="0" incomingRoad="0">
             <laneLink from="1" to="-1"/>
         </connection>
-        <connection connectingRoad="112" contactPoint="start" id="1" incomingRoad="103">
-            <laneLink from="-1" to="1"/>
+        <connection connectingRoad="116" contactPoint="start" id="1" incomingRoad="107">
             <laneLink from="1" to="-1"/>
         </connection>
-        <connection connectingRoad="104" contactPoint="end" id="2" incomingRoad="100">
+        <connection connectingRoad="108" contactPoint="end" id="2" incomingRoad="104">
             <laneLink from="-1" to="-1"/>
-            <laneLink from="1" to="1"/>
         </connection>
-        <connection connectingRoad="104" contactPoint="start" id="3" incomingRoad="103">
+        <connection connectingRoad="108" contactPoint="start" id="3" incomingRoad="107">
             <laneLink from="-1" to="-1"/>
-            <laneLink from="1" to="1"/>
         </connection>
-        <connection connectingRoad="108" contactPoint="end" id="4" incomingRoad="100">
-            <laneLink from="-1" to="1"/>
+        <connection connectingRoad="112" contactPoint="end" id="4" incomingRoad="104">
             <laneLink from="1" to="-1"/>
         </connection>
-        <connection connectingRoad="108" contactPoint="start" id="5" incomingRoad="0">
-            <laneLink from="-1" to="-1"/>
+        <connection connectingRoad="112" contactPoint="start" id="5" incomingRoad="0">
             <laneLink from="1" to="1"/>
         </connection>
     </junction>
-    <junction id="1" name="my junction">
-        <connection connectingRoad="113" contactPoint="end" id="0" incomingRoad="1">
-            <laneLink from="-1" to="1"/>
+    <junction id="101" name="my junction">
+        <connection connectingRoad="117" contactPoint="end" id="0" incomingRoad="1">
             <laneLink from="1" to="-1"/>
         </connection>
-        <connection connectingRoad="113" contactPoint="start" id="1" incomingRoad="100">
-            <laneLink from="-1" to="1"/>
+        <connection connectingRoad="117" contactPoint="start" id="1" incomingRoad="104">
             <laneLink from="1" to="-1"/>
         </connection>
-        <connection connectingRoad="105" contactPoint="end" id="2" incomingRoad="101">
+        <connection connectingRoad="109" contactPoint="end" id="2" incomingRoad="105">
             <laneLink from="-1" to="-1"/>
-            <laneLink from="1" to="1"/>
         </connection>
-        <connection connectingRoad="105" contactPoint="start" id="3" incomingRoad="100">
+        <connection connectingRoad="109" contactPoint="start" id="3" incomingRoad="104">
             <laneLink from="-1" to="-1"/>
-            <laneLink from="1" to="1"/>
         </connection>
-        <connection connectingRoad="109" contactPoint="end" id="4" incomingRoad="101">
-            <laneLink from="-1" to="1"/>
+        <connection connectingRoad="113" contactPoint="end" id="4" incomingRoad="105">
             <laneLink from="1" to="-1"/>
         </connection>
-        <connection connectingRoad="109" contactPoint="start" id="5" incomingRoad="1">
-            <laneLink from="-1" to="-1"/>
+        <connection connectingRoad="113" contactPoint="start" id="5" incomingRoad="1">
             <laneLink from="1" to="1"/>
         </connection>
     </junction>
-    <junction id="2" name="my junction">
-        <connection connectingRoad="114" contactPoint="end" id="0" incomingRoad="2">
-            <laneLink from="-1" to="1"/>
+    <junction id="102" name="my junction">
+        <connection connectingRoad="118" contactPoint="end" id="0" incomingRoad="2">
             <laneLink from="1" to="-1"/>
         </connection>
-        <connection connectingRoad="114" contactPoint="start" id="1" incomingRoad="101">
-            <laneLink from="-1" to="1"/>
+        <connection connectingRoad="118" contactPoint="start" id="1" incomingRoad="105">
             <laneLink from="1" to="-1"/>
         </connection>
-        <connection connectingRoad="106" contactPoint="end" id="2" incomingRoad="102">
+        <connection connectingRoad="110" contactPoint="end" id="2" incomingRoad="106">
             <laneLink from="-1" to="-1"/>
-            <laneLink from="1" to="1"/>
         </connection>
-        <connection connectingRoad="106" contactPoint="start" id="3" incomingRoad="101">
+        <connection connectingRoad="110" contactPoint="start" id="3" incomingRoad="105">
             <laneLink from="-1" to="-1"/>
-            <laneLink from="1" to="1"/>
         </connection>
-        <connection connectingRoad="110" contactPoint="end" id="4" incomingRoad="102">
-            <laneLink from="-1" to="1"/>
+        <connection connectingRoad="114" contactPoint="end" id="4" incomingRoad="106">
             <laneLink from="1" to="-1"/>
         </connection>
-        <connection connectingRoad="110" contactPoint="start" id="5" incomingRoad="2">
-            <laneLink from="-1" to="-1"/>
+        <connection connectingRoad="114" contactPoint="start" id="5" incomingRoad="2">
             <laneLink from="1" to="1"/>
         </connection>
     </junction>
-    <junction id="3" name="my junction">
-        <connection connectingRoad="115" contactPoint="end" id="0" incomingRoad="3">
-            <laneLink from="-1" to="1"/>
+    <junction id="103" name="my junction">
+        <connection connectingRoad="119" contactPoint="end" id="0" incomingRoad="3">
             <laneLink from="1" to="-1"/>
         </connection>
-        <connection connectingRoad="115" contactPoint="start" id="1" incomingRoad="102">
-            <laneLink from="-1" to="1"/>
+        <connection connectingRoad="119" contactPoint="start" id="1" incomingRoad="106">
             <laneLink from="1" to="-1"/>
         </connection>
-        <connection connectingRoad="107" contactPoint="end" id="2" incomingRoad="103">
+        <connection connectingRoad="111" contactPoint="end" id="2" incomingRoad="107">
             <laneLink from="-1" to="-1"/>
-            <laneLink from="1" to="1"/>
         </connection>
-        <connection connectingRoad="107" contactPoint="start" id="3" incomingRoad="102">
+        <connection connectingRoad="111" contactPoint="start" id="3" incomingRoad="106">
             <laneLink from="-1" to="-1"/>
-            <laneLink from="1" to="1"/>
         </connection>
-        <connection connectingRoad="111" contactPoint="end" id="4" incomingRoad="103">
-            <laneLink from="-1" to="1"/>
+        <connection connectingRoad="115" contactPoint="end" id="4" incomingRoad="107">
             <laneLink from="1" to="-1"/>
         </connection>
-        <connection connectingRoad="111" contactPoint="start" id="5" incomingRoad="3">
-            <laneLink from="-1" to="-1"/>
+        <connection connectingRoad="115" contactPoint="start" id="5" incomingRoad="3">
             <laneLink from="1" to="1"/>
         </connection>
     </junction>
