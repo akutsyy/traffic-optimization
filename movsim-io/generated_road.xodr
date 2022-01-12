@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <OpenDRIVE>
-   <header date="2022-01-11 21:37:34.123117" east="0.0" name="myroads" north="0.0" revMajor="1" revMinor="5" south="0.0" west="0.0"/>
+   <header date="2022-01-12 15:05:56.390297" east="0.0" name="myroads" north="0.0" revMajor="1" revMinor="5" south="0.0" west="0.0"/>
    <road id="1" junction="-1" length="100">
       <link>
          <successor elementId="100" elementType="junction"/>
@@ -111,7 +111,7 @@
    </road>
    <road id="104" junction="-1" length="18.204032342727785" name="circle road 0">
       <link>
-         <predecessor elementId="100" elementType="junction"/>
+         <predecessor elementId="104" elementType="junction"/>
          <successor elementId="103" elementType="junction"/>
       </link>
       <planView>
@@ -133,7 +133,7 @@
    </road>
    <road id="105" junction="-1" length="18.204032342727785" name="circle road 1">
       <link>
-         <predecessor elementId="101" elementType="junction"/>
+         <predecessor elementId="105" elementType="junction"/>
          <successor elementId="100" elementType="junction"/>
       </link>
       <planView>
@@ -155,7 +155,7 @@
    </road>
    <road id="106" junction="-1" length="18.204032342727785" name="circle road 2">
       <link>
-         <predecessor elementId="102" elementType="junction"/>
+         <predecessor elementId="106" elementType="junction"/>
          <successor elementId="101" elementType="junction"/>
       </link>
       <planView>
@@ -177,7 +177,7 @@
    </road>
    <road id="107" junction="-1" length="18.204032342727785" name="circle road 3">
       <link>
-         <predecessor elementId="103" elementType="junction"/>
+         <predecessor elementId="107" elementType="junction"/>
          <successor elementId="102" elementType="junction"/>
       </link>
       <planView>

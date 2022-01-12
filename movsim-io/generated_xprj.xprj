@@ -18,7 +18,7 @@
          </LaneChangeModelType>
       </VehiclePrototypeConfiguration>
    </VehiclePrototypes>
-   <Scenario network_filename="generated_road.xodr">
+   <Scenario network_filename="example.xodr">
       <Simulation crash_exit="false" timestep="0.2">
          <TrafficComposition>
             <VehicleType fraction="0.8" label="car" relative_v0_randomization="0.2"/>

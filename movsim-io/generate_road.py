@@ -50,8 +50,8 @@ def generate_road(roads, intersections, intersection_type="direct", filename="ge
         local_roads = [roads[i] for i in intersection if i >= 0]
         if intersection_type == "simple":
             angles = [FOURWAY[i] for i, x in enumerate(intersection) if x >= 0]
-            jr = generator_fixes.create_junction_roads(local_roads, angles, [40], junction=id + 1,
-                                                       startnum=1000 * (id + 1), debug_level=debug_level)
+            jr = fixes.create_junction_roads(local_roads, angles, [40], junction=id + 1,
+                                             startnum=1000 * (id + 1), debug_level=debug_level)
             junction_roads.append(jr)
 
             j = xodr.create_junction(jr, id + 1, local_roads)
@@ -103,13 +103,125 @@ def generate_road(roads, intersections, intersection_type="direct", filename="ge
         esmini(odr, os.path.join('esmini-linux'), car_density=5)
 
 
-def generate_roundabout(lanes, in_roads,in_mask, r, d_road, startnum):
+def generate_roundabout_2lane(spoke_roads, in_mask, r, d, startnum):
+    sections = len(spoke_roads)
+    spoke_contacts = [END if x else START for x in in_mask]
+    merge_portion = 0.25
+
+    exit_r = (d ** 2 + 2 * d * r) / (2 * r)
+
+    exit_arc = xodr.Arc(0.5 / exit_r, angle=np.arctan2((r + d), exit_r))
+
+    short_angle = np.arctan2(exit_r, r + d) * 2
+    long_angle = ((2 * np.pi - sections * short_angle) / sections) * (1 - 2 * merge_portion)
+    merge_angle = ((2 * np.pi - sections * short_angle) / sections) * merge_portion
+
+    short_arc = xodr.Arc(0.5 / r, angle=short_angle)
+    long_arc = xodr.Arc(0.5 / r, angle=long_angle)
+    merge_arc = xodr.Arc(0.5 / (r + 6), angle=merge_angle)
+
+    long_roads = []
+    f_merge_roads = []
+    s_merge_roads = []
+    junction_roads = []
+    junctions = []
+
+    def jn_spoke(i):
+        return startnum + (i % sections)
+
+    def jn_merge_in(i):
+        return startnum + (i % sections) + sections
+
+    def jn_merge_out(i):
+        return startnum + (i % sections) + 2 * sections
+
+    def spoke_n(i):
+        return spoke_roads[i % sections].id
+
+    def long_n(i):
+        return startnum + (i % sections) + sections
+
+    def f_merge_n(i):
+        return startnum + (i % sections) + 2 * sections
+
+    def s_merge_n(i):
+        return startnum + (i % sections) + 3 * sections
+
+    def in_n(i):
+        return startnum + (i % sections) + 4 * sections
+
+    def out_n(i):
+        return startnum + (i % sections) + 5 * sections
+
+    def continue_n(i):
+        return startnum + (i % sections) + 6 * sections
+
+    for i in range(sections):
+        if (in_mask[i]):
+            spoke_roads[i].add_successor(xodr.ElementType.junction, jn_spoke(i))
+        else:
+            spoke_roads[i].add_predecessor(xodr.ElementType.junction, jn_spoke(i))
+
+    # Create roundabout components
+    for i in range(sections):
+        long_roads.append(xodr.create_road([long_arc], id=long_n(i), left_lanes=0, right_lanes=2))
+        long_roads[i].name = "circle road " + str(i)
+        long_roads[i].add_predecessor(xodr.ElementType.road, f_merge_n(i), contact_point=END)
+        long_roads[i].add_successor(xodr.ElementType.road, s_merge_n(i), contact_point=START)
+
+        # TWO MERGE SECTIONS
+        f_merge_roads.append(xodr.create_road([merge_arc], id=f_merge_n(i), left_lanes=0, right_lanes=4))
+        f_merge_roads[i].name = "first merge road " + str(i)
+        f_merge_roads[i].add_predecessor(xodr.ElementType.junction, jn_merge_in(i))
+        f_merge_roads[i].add_successor(xodr.ElementType.road, long_n(i), contact_point=START)
+
+        s_merge_roads.append(xodr.create_road([merge_arc], id=s_merge_n(i), left_lanes=0, right_lanes=4))
+        s_merge_roads[i].name = "second merge road " + str(i)
+        s_merge_roads[i].add_predecessor(xodr.ElementType.road, long_n(i), contact_point=END)
+        s_merge_roads[i].add_successor(xodr.ElementType.junction, jn_merge_out(i + 1))
+
+    # Create junctions
+    for i in range(sections):
+        in_road = xodr.create_road([exit_arc], id=in_n(i), left_lanes=0, right_lanes=2)
+        in_road.name = "in_road " + str(i)
+        in_road.add_predecessor(xodr.ElementType.junction, jn_merge_in(i))
+        in_road.add_successor(xodr.ElementType.road, spoke_n(i), contact_point=spoke_contacts[i])
+
+        out_road = xodr.create_road([exit_arc], id=out_n(i), left_lanes=0, right_lanes=2)
+        out_road.name = "out_road " + str(i)
+        out_road.add_predecessor(xodr.ElementType.road, spoke_n(i), contact_point=spoke_contacts[i])
+        out_road.add_successor(xodr.ElementType.junction, jn_merge_out(i))
+
+        continue_road = xodr.create_road([short_arc], id=continue_n(i), left_lanes=0, right_lanes=2)
+        continue_road.name = "continue_road " + str(i)
+        continue_road.add_predecessor(xodr.ElementType.junction, jn_merge_out(i))
+        continue_road.add_successor(xodr.ElementType.junction, jn_merge_out(i))
+
+        junction_roads.append(in_road)
+        junction_roads.append(out_road)
+        junction_roads.append(continue_road)
+
+        junctions.append(xodr.create_junction([], id=jn_merge_out(i),
+                                              roads=[s_merge_roads[i - 1], out_road, continue_road]))
+
+        junctions.append(xodr.create_junction([], id=jn_merge_in(i),
+                                              roads=[continue_road, in_roads, f_merge_roads[i]]))
+
+        junctions.append(xodr.create_junction([], id=jn_spoke(i),
+                                              roads=[in_road, spoke_roads[i], out_road]))
+
+    all_roads = long_roads + f_merge_roads + s_merge_roads + junction_roads
+
+    return all_roads, junctions
+
+
+def generate_faulty_roundabout(lanes, in_roads, in_mask, r, d_road, startnum):
     sections = len(in_roads)
     lane_width = 3
     d = d_road
 
     exit_r = (d ** 2 + 2 * d * r) / (2 * r)
-    in_arc = xodr.Arc(0.5 / (exit_r-lane_width*lanes/2), angle=np.arctan2((r + d), exit_r))
+    in_arc = xodr.Arc(0.5 / (exit_r - lane_width * lanes / 2), angle=np.arctan2((r + d), exit_r))
     out_arc = xodr.Arc(-0.5 / (exit_r), angle=np.arctan2((r + d), exit_r))
 
     short_angle = np.arctan2(exit_r, r + d) * 2
@@ -121,16 +233,16 @@ def generate_roundabout(lanes, in_roads,in_mask, r, d_road, startnum):
     junctions = []
 
     for i in range(sections):
-        if(in_mask[i]):
+        if (in_mask[i]):
             in_roads[i].add_successor(xodr.ElementType.junction, startnum + i)
         else:
             in_roads[i].add_predecessor(xodr.ElementType.junction, startnum + i)
 
     for i in range(sections):
-        circle_roads.append(xodr.create_road([long],id=startnum + sections + i, lane_width=lane_width,
+        circle_roads.append(xodr.create_road([long], id=startnum + sections + i, lane_width=lane_width,
                                              left_lanes=0, right_lanes=lanes))
-        circle_roads[i].name = "circle road "+str(i)
-        circle_roads[i].add_predecessor(xodr.ElementType.junction, startnum + i)
+        circle_roads[i].name = "circle road " + str(i)
+        circle_roads[i].add_predecessor(xodr.ElementType.junction, startnum + i + sections)
         circle_roads[i].add_successor(xodr.ElementType.junction, startnum + (i - 1) % sections)
 
     for i in range(sections):
@@ -146,17 +258,17 @@ def generate_roundabout(lanes, in_roads,in_mask, r, d_road, startnum):
         # Into the roundabout
         in_junct = xodr.create_road([in_arc], id=startnum + i + sections * 3, lane_width=lane_width,
                                     left_lanes=0, right_lanes=lanes, road_type=junction_id)
-        in_junct.add_predecessor(xodr.ElementType.road, in_roads[i].id, contact_point=END,lane_offset=lanes)
+        in_junct.add_predecessor(xodr.ElementType.road, in_roads[i].id, contact_point=END, lane_offset=lanes)
         in_junct.add_successor(xodr.ElementType.road, startnum + sections + i, contact_point=END)
-        in_junct.name = "in_junct "+str(i)
+        in_junct.name = "in_junct " + str(i)
 
         # Out of roundabout
         out_junct = xodr.create_road([out_arc], id=startnum + i + sections * 4,
                                      lane_width=lane_width, left_lanes=0, right_lanes=lanes, road_type=junction_id)
         out_junct.add_successor(xodr.ElementType.road, startnum + sections + ((i - 1) % sections),
-                                  contact_point=START,lane_offset=0)
+                                contact_point=START, lane_offset=0)
         out_junct.add_predecessor(xodr.ElementType.road, in_roads[i].id, contact_point=END)
-        out_junct.name = "out_junct "+str(i)
+        out_junct.name = "out_junct " + str(i)
 
         local_joints.append(out_junct)
         local_joints.append(in_circle)
@@ -208,30 +320,31 @@ def post_process(filename):
                 if condition(child):
                     parents.remove(child)
                 if nested:
-                    iterator(child,nested=True)
+                    iterator(child, nested=True)
+
         iterator(root, nested=True)
 
-    def change_attribute(element,attribute,old_value,new_value):
+    def change_attribute(element, attribute, old_value, new_value):
         for e in root.iter(element):
             if attribute in e.attrib:
                 if e.attrib[attribute] == old_value:
                     e.attrib[attribute] = new_value
 
-    def reverse_order(parent,wrongfirst):
+    def reverse_order(parent, wrongfirst):
         for e in root.iter(parent):
-            if e.tag == parent and len(e)>0 and list(e)[0].tag == wrongfirst:
+            if e.tag == parent and len(e) > 0 and list(e)[0].tag == wrongfirst:
                 l2 = list(e)
                 l2.reverse()
                 e[:] = l2
+
     filter_attribute('road', 'rule')
-    change_attribute('predecessor','id','0','1')
-    filter_element(condition=(lambda x : x.tag == 'roadMark'))
+    change_attribute('predecessor', 'id', '0', '1')
+    filter_element(condition=(lambda x: x.tag == 'roadMark'))
     filter_element(condition=(lambda x: x.tag == 'center'))
     filter_element(condition=(lambda x: x.tag == 'elevationProfile'))
-    filter_element(condition=(lambda x : 'type' in x.attrib and x.attrib['type'] == 'none'))
+    filter_element(condition=(lambda x: 'type' in x.attrib and x.attrib['type'] == 'none'))
 
-    reverse_order('link','successor')
-
+    reverse_order('link', 'successor')
 
     xmlstr = minidom.parseString(ET.tostring(root)).toprettyxml(indent="   ")
     xmlstr = "\n".join([ll.rstrip() for ll in xmlstr.splitlines() if ll.strip()])
@@ -242,11 +355,11 @@ def post_process(filename):
 if __name__ == '__main__':
     in_roads = []
     for i in range(4):
-        in_roads.append(xodr.create_straight_road(i+1, 100))
-    in_mask = [True,False,False,False] # Defines which way the roads "point"
-    roads, junctions = generate_roundabout(lanes=1, in_roads=in_roads,in_mask = in_mask, r=10, d_road=4, startnum=100)
+        in_roads.append(xodr.create_straight_road(i + 1, 100))
+    in_mask = [True, False, False, False]  # Defines which way the roads "point"
+    roads, junctions = generate_roundabout_2lane(spoke_roads=in_roads, in_mask=in_mask, r=10, d=4, startnum=100)
     odr = join_all([in_roads, roads], [junctions], "generated_road.xodr")
     post_process("generated_road.xodr")
-    # show_road(odr)
+    show_road(odr)
     # roads,intersections = square_grid(5,5,lanes=2)
     # generate_road(roads,intersections,intersection_type="simple",visualize=True,debug_level=0)
