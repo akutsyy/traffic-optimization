@@ -1,0 +1,4 @@
+GPy
+emukit
+pandas
+lxml
