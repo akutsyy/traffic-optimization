@@ -48,8 +48,9 @@ def set_session():
     session = True
 
 def go():
+    os.remove("sum.xml")
     cmd = [sumoBinary, "-c", "inter1.sumocfg", "--start", "--quit-on-end",
-           "--summary", "sum.xml", "--tripinfo-output", "tripinfo.xml"]
+           "--summary", "sum.xml", "--tripinfo-output", "tripinfo.xml", "--no-warnings"]
     traci.start(cmd)
     while traci.simulation.getMinExpectedNumber() > 0:
         traci.simulationStep()
@@ -69,10 +70,10 @@ def update_network(network_type, param_list):
         return False
 
     #Mock param list:
-    param_list = [99,3,106,12,
-                  0.5,0.5,
-                  1,1,1,
-                  0.9,0.9,0.9,0.9,0.9,0.45,0.45,0.45,0.1,0.1,0.1,0.1]
+    #param_list = [99,3,106,12,
+    #              0.5,0.5,
+    #             1,1,1,
+    #              0.9,0.9,0.9,0.9,0.9,0.45,0.45,0.45,0.1,0.1,0.1,0.1]
     assert len(param_list) == 21
 
     """

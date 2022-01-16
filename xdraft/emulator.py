@@ -9,8 +9,8 @@ from runner import call_sim
 
 class emu():
     def __init__(self, iterations):
-        X = np.array([[1]*4 + [0]*17])
-        Y = np.array([[call_sim(X[0])]])
+        X = [[1, 1, 1, 1, 0, 0.01, 2, 2, 2, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]]
+        Y = [[call_sim(X[0])]]
 
         # Define parameter space for the simulator variables
         space = ParameterSpace([ContinuousParameter('traffic_light_1', 1, 100),
@@ -18,7 +18,7 @@ class emu():
                                 ContinuousParameter('traffic_light_3', 1, 100),
                                 ContinuousParameter('traffic_light_4', 1, 100),
                                 ContinuousParameter('sigma', 0, 1),
-                                ContinuousParameter('tau', 0, 1000), # Don't know how to do no upper bound
+                                ContinuousParameter('tau', 0.01, 1000), # Don't know how to do no upper bound
                                 ContinuousParameter('trucks', 0, 100),
                                 ContinuousParameter('cars', 0, 100),
                                 ContinuousParameter('bikes', 0, 100),
@@ -37,9 +37,9 @@ class emu():
                                 ])
 
         # Kernel
-        kern = GPy.kern.RBF(1, lengthscale=0.08, variance=20)
+        kern = GPy.kern.RBF(21, lengthscale=0.08, variance=20)
         # GP
-        gpy_model = GPy.models.GPRegression(X, Y, kern, noise_var=1e-10)
+        gpy_model = GPy.models.GPRegression(np.array(X), np.array(Y), kern, noise_var=1e-10)
         # Emukit Model
         emukit_model = GPyModelWrapper(gpy_model)
 
@@ -57,11 +57,13 @@ class emu():
             x_new, _ = optimizer.optimize(us_acquisition)
 
             # Run simulator on new
-            y_new = np.array([[call_sim(x_new[0])]])
-            print(y_new)
+            y_new = [[call_sim(list(x_new[0]))]]
 
-            X = np.append(X, x_new, axis=0)
-            Y = np.append(Y, y_new, axis=0)
+
+            X.append(x_new)
+            Y.append(y_new)
+            print(f"X: {X}")
+            print(f"Y: {Y}")
 
             # Add data to model
             emukit_model.set_data(X, Y)
@@ -102,4 +104,4 @@ class emu():
         maximum = None # TODO
         return maximum
 
-emu(10)
+emu(1)
