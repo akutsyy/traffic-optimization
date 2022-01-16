@@ -10,4 +10,8 @@
         <route-files value="draft.rou.xml"/>
     </input>
 
+    <gui_only>
+        <gui-settings-file value="flick.cfg"/>
+    </gui_only>
+
 </configuration>

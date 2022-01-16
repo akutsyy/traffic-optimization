@@ -6,6 +6,7 @@ from scipy import integrate
 import xml.etree.ElementTree as ET
 import os
 
+global session
 session = False
 NO_GUI = False
 TRAFFIC_TYPES = ['car1', 'truck1', 'bike1']
@@ -28,7 +29,7 @@ def call_sim(params, network_type='intersection'):
     ret_code = update_network(network_type, params)
     if not ret_code:
         return 0.0
-    go(session)
+    go()
     return get_sum_stats(METRIC)
 
 
@@ -42,14 +43,17 @@ def get_sum_stats(metric='meanSpeedRelative'):
     metric_out = int(int(integrate.trapezoid(df['ended'], df[metric])) / df['ended'].values[-1])
     return metric_out
 
+def set_session():
+    global session
+    session = True
 
-def go(session):
+def go():
     cmd = [sumoBinary, "-c", "inter1.sumocfg", "--start", "--quit-on-end",
            "--summary", "sum.xml", "--tripinfo-output", "tripinfo.xml"]
     print(cmd)
     if not session:
         traci.start(cmd)
-        session = False
+        set_session()
     else:
         traci.load(cmd.remove('--quit-on-end'))
     while traci.simulation.getMinExpectedNumber() > 0:
@@ -137,4 +141,4 @@ if __name__ == "__main__":
 
     # this script has been called from the command line. It will start sumo as a
     # server, then connect and run
-    if not NO_SIM: go(session)
+    if not NO_SIM: go()
