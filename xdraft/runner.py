@@ -48,17 +48,17 @@ def set_session():
     session = True
 
 def go():
-    cmd = [sumoBinary, "-c", "inter1.sumocfg", "--start", "--quit-on-end",
+    cmd = [sumoBinary, "-c", "inter1.sumocfg", "--start",
            "--summary", "sum.xml", "--tripinfo-output", "tripinfo.xml"]
     print(cmd)
     if not session:
         traci.start(cmd)
         set_session()
     else:
-        traci.load(cmd.remove('--quit-on-end'))
+        traci.load(cmd[1:])
     while traci.simulation.getMinExpectedNumber() > 0:
         traci.simulationStep()
-    traci.close()
+    #traci.close()
 
 
 # total is total traffic flow on edge, ratios is ratio of proportions
@@ -145,3 +145,4 @@ if __name__ == "__main__":
     # server, then connect and run
     if  NO_SIM: go()
     update_network('intersection',[])
+    go()
