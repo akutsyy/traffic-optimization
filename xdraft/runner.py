@@ -13,7 +13,7 @@ TRAFFIC_TYPES = ['car1', 'truck1', 'bike1']
 pd.set_option('display.max_columns', None)
 METRIC = 'meanSpeedRelative'
 
-NO_SIM = False  # skip re-simulating
+NO_SIM = True  # skip re-simulating
 
 # Setup sumo
 if NO_GUI:
@@ -65,20 +65,19 @@ def go():
 # e.g. total flow of 10 and truck:car:bike ratio of 5:3:2 = 5 trucks, 3 cars, 2 bikes
 #selected is which ratio element (by value)
 def get_props_from_total(total, ratios, selected):
-    return round(total * selected / sum(ratios),5)
+    return str(round(total * selected / sum(ratios),5))
 
 
 def update_network(network_type, param_list):
     # Must have all routes flowing to stop it falling into just allowing the busiest lane to flow only.
-    #Probability values above 0.5 for any traffic type will make the sim take 30+ mins.
-    if 0 in param_list[0:4] or any(z>0.5 for z in param_list[9:]):
+    if 0 in param_list[0:4]:
         return False
 
     #Mock param list:
-    """param_list = [99,3,106,12,
+    param_list = [99,3,106,12,
                   0.5,0.5,
                   1,1,1,
-                  0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1]"""
+                  0.9,0.9,0.9,0.9,0.9,0.45,0.45,0.45,0.1,0.1,0.1,0.1]
     assert len(param_list) == 21
 
     """
@@ -124,8 +123,10 @@ def update_network(network_type, param_list):
 
         #Set tau and sigma for all vTypes
         for vType in root.findall('vType'):
-            vType.set('sigma',param_list[4])
-            vType.set('tau',param_list[5])
+            vType.set('sigma',str(param_list[4]))
+            vType.set('tau',str(param_list[5]))
+
+        root.write('./draft.rou.xml')
 
     #Update the traffic lights
     with open(os.path.join(os.path.dirname(__file__), './draft.net.xml')) as f:
@@ -133,6 +134,7 @@ def update_network(network_type, param_list):
         for i, phase in enumerate(root.find('tlLogic')):
             #print(phase.attrib, param_list[i], get_props_from_total(1,param_list[0:4],param_list[i]))
             phase.set('duration', get_props_from_total(1,param_list[0:4],param_list[i]))
+        root.write('./draft.net.xml')
 
     return True
 
@@ -141,4 +143,5 @@ if __name__ == "__main__":
 
     # this script has been called from the command line. It will start sumo as a
     # server, then connect and run
-    if not NO_SIM: go()
+    if  NO_SIM: go()
+    update_network('intersection',[])
