@@ -8,7 +8,7 @@ import os
 
 global session
 session = False
-NO_GUI = False
+NO_GUI = True
 TRAFFIC_TYPES = ['car1', 'truck1', 'bike1']
 pd.set_option('display.max_columns', None)
 METRIC = 'meanSpeedRelative'
@@ -48,15 +48,12 @@ def set_session():
     session = True
 
 def go():
-    cmd = [sumoBinary, "-c", "inter1.sumocfg", "--start",
+    cmd = [sumoBinary, "-c", "inter1.sumocfg", "--start", "--quit-on-end",
            "--summary", "sum.xml", "--tripinfo-output", "tripinfo.xml"]
-    if not session:
-        traci.start(cmd)
-        set_session()
-    else:
-        traci.load(cmd[1:])
+    traci.start(cmd)
     while traci.simulation.getMinExpectedNumber() > 0:
         traci.simulationStep()
+    traci.close()
 
 
 # total is total traffic flow on edge, ratios is ratio of proportions
