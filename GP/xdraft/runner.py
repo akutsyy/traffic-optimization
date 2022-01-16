@@ -4,6 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy import integrate
 import xml.etree.ElementTree as ET
+import os
 
 session = False
 NO_GUI = False
@@ -45,6 +46,7 @@ def get_sum_stats(metric='meanSpeedRelative'):
 def go(session):
     cmd = [sumoBinary, "-c", "inter1.sumocfg", "--start", "--quit-on-end",
            "--summary", "sum.xml", "--tripinfo-output", "tripinfo.xml"]
+    print(cmd)
     if not session:
         traci.start(cmd)
         session = False
@@ -89,14 +91,15 @@ def update_network(network_type, param_list):
     see: https://sumo.dlr.de/docs/Simulation/Randomness.html#flows_with_a_random_number_of_vehicles
     NB: Not modelled per lane so can have duplicate spawns of vehicle types; sumo handles these rare cases by dropping extra vehicles.
         (NB in the xml files, SUMO uses 1=North 2=East 3=West 4=South)
-        9: N->E (i.e. 1->2) 10: N->S  11: N->W  
-        12: E->N  13: E->S  14: E->W  
+        9: N->E (i.e. 1->2) 10: N->S  11: N->W
+        12: E->N  13: E->S  14: E->W
         15: S->N  16: S->E  17: S->W
         18: W->N  19: W->E  20: W->S
-        
+
     """
     print(list(zip(param_list,range(0,len(param_list)))))
-    with open('./draft.rou.xml') as f:
+
+    with open(os.path.join(os.path.dirname(__file__), './draft.rou.xml')) as f:
         root = ET.parse(f)
 
         # Update probability of emissions ( = flow):
@@ -121,7 +124,7 @@ def update_network(network_type, param_list):
             vType.set('tau',param_list[5])
 
     #Update the traffic lights
-    with open('./draft.net.xml') as f:
+    with open(os.path.join(os.path.dirname(__file__), './draft.net.xml')) as f:
         root = ET.parse(f)
         for i, phase in enumerate(root.find('tlLogic')):
             #print(phase.attrib, param_list[i], get_props_from_total(1,param_list[0:4],param_list[i]))

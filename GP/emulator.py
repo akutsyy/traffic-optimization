@@ -1,16 +1,40 @@
 import GPy
+import numpy as np
 from emukit.model_wrappers.gpy_model_wrappers import GPyModelWrapper
 from emukit.experimental_design.acquisitions import ModelVariance
 from emukit.core.optimization import GradientAcquisitionOptimizer
 from emukit.examples.gp_bayesian_optimization.single_objective_bayesian_optimization import GPBayesianOptimization
+from emukit.core import ParameterSpace, ContinuousParameter, DiscreteParameter
+from xdraft.runner import call_sim
 
 class emu():
     def __init__(self, iterations):
-        X = None #TODO: Add some initial points
-        Y = None #TODO
+        X = np.array([[1]*4 + [0]*17])
+        Y = np.array([[call_sim(X[0])]])
 
-        # Define parameter space
-        space = None #TODO (emukit.core.parameter_space.ParameterSpace)
+        # Define parameter space for the simulator variables
+        space = ParameterSpace([ContinuousParameter('traffic_light_1', 0, 100),
+                                ContinuousParameter('traffic_light_2', 0, 100),
+                                ContinuousParameter('traffic_light_3', 0, 100),
+                                ContinuousParameter('traffic_light_4', 0, 100),
+                                ContinuousParameter('sigma', 0, 1),
+                                ContinuousParameter('tau', 0, 1000), # Don't know how to do no upper bound
+                                ContinuousParameter('trucks', 0, 100),
+                                ContinuousParameter('cars', 0, 100),
+                                ContinuousParameter('bikes', 0, 100),
+                                ContinuousParameter('NE', 0, 1),
+                                ContinuousParameter('NS', 0, 1),
+                                ContinuousParameter('NW', 0, 1),
+                                ContinuousParameter('EN', 0, 1),
+                                ContinuousParameter('ES', 0, 1),
+                                ContinuousParameter('EW', 0, 1),
+                                ContinuousParameter('SN', 0, 1),
+                                ContinuousParameter('SE', 0, 1),
+                                ContinuousParameter('SW', 0, 1),
+                                ContinuousParameter('WN', 0, 1),
+                                ContinuousParameter('WE', 0, 1),
+                                ContinuousParameter('WS', 0, 1),
+                                ])
 
         # Kernel
         kern = GPy.kern.RBF(1, lengthscale=0.08, variance=20)
@@ -28,12 +52,13 @@ class emu():
         # Acquisition optimiser
         optimizer = GradientAcquisitionOptimizer(space)
 
-        for _ in range(ITERATIONS):
+        for _ in range(iterations):
             # Get next point
             x_new, _ = optimizer.optimize(us_acquisition)
 
             # Run simulator on new
-            # TODO: y_new = Simulator(x_new)
+            y_new = np.array([[call_sim(x_new[0])]])
+            print(y_new)
 
             X = np.append(X, x_new, axis=0)
             Y = np.append(Y, y_new, axis=0)
@@ -76,3 +101,5 @@ class emu():
         bo.run_optimization(partial_call, 10)
         maximum = None # TODO
         return maximum
+
+emu(10)
