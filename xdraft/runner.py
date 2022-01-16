@@ -25,11 +25,11 @@ else:
 #MAIN FUNCTION TO CALL SIMULATOR
 #Input: params - 21 length long vector - definition below
 #Returns: Health metric depending on that set above. A higher value for this is better.
-def call_sim(params, network_type='intersection'):
+def call_sim(params, network_type='intersection', early_stop=False):
     ret_code = update_network(network_type, params)
     if not ret_code:
         return 0.0
-    go()
+    go(early_stop=early_stop)
     return get_sum_stats(METRIC)
 
 
@@ -47,13 +47,16 @@ def set_session():
     global session
     session = True
 
-def go():
+def go(early_stop = False):
     os.remove("sum.xml")
     cmd = [sumoBinary, "-c", "inter1.sumocfg", "--start", "--quit-on-end",
            "--summary", "sum.xml", "--tripinfo-output", "tripinfo.xml", "--no-warnings"]
     traci.start(cmd)
+    iterations = 0
     while traci.simulation.getMinExpectedNumber() > 0:
         traci.simulationStep()
+        iterations +=1
+        if (iterations >= 100) & early_stop: break
     traci.close()
 
 
