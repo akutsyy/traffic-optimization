@@ -48,7 +48,7 @@ def set_session():
     session = True
 
 def go(early_stop = False):
-    os.remove("sum.xml")
+    open("sum.xml",'w').close()
     cmd = [sumoBinary, "-c", "inter1.sumocfg", "--start", "--quit-on-end",
            "--summary", "sum.xml", "--tripinfo-output", "tripinfo.xml", "--no-warnings"]
     traci.start(cmd)
