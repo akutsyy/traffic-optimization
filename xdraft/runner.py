@@ -58,7 +58,6 @@ def go():
         traci.load(cmd[1:])
     while traci.simulation.getMinExpectedNumber() > 0:
         traci.simulationStep()
-    #traci.close()
 
 
 # total is total traffic flow on edge, ratios is ratio of proportions
@@ -146,3 +145,4 @@ if __name__ == "__main__":
     if  NO_SIM: go()
     update_network('intersection',[])
     go()
+    traci.close()
