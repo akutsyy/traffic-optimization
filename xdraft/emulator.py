@@ -9,8 +9,8 @@ from runner import call_sim
 
 class emu():
     def __init__(self, iterations):
-        X = [[1, 1, 1, 1, 0, 0.01, 2, 2, 2, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]]
-        Y = [[call_sim(X[0])]]
+        X = np.array([[1, 1, 1, 1, 0, 0.01, 2, 2, 2, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]])
+        Y = np.array([[call_sim(X[0])]])
 
         # Define parameter space for the simulator variables
         space = ParameterSpace([ContinuousParameter('traffic_light_1', 1, 100),
@@ -39,7 +39,7 @@ class emu():
         # Kernel
         kern = GPy.kern.RBF(21, lengthscale=0.08, variance=20)
         # GP
-        gpy_model = GPy.models.GPRegression(np.array(X), np.array(Y), kern, noise_var=1e-10)
+        gpy_model = GPy.models.GPRegression(X, Y, kern, noise_var=1e-10)
         # Emukit Model
         emukit_model = GPyModelWrapper(gpy_model)
 
@@ -57,16 +57,16 @@ class emu():
             x_new, _ = optimizer.optimize(us_acquisition)
 
             # Run simulator on new
-            y_new = [[call_sim(list(x_new[0]))]]
+            y_new = np.array([call_sim(list(x_new[0]), early_stop=True)])
 
 
-            X.append(x_new)
-            Y.append(y_new)
+            X = np.append(X, x_new, axis=0)
+            Y = np.append(Y, np.expand_dims(y_new, 0), axis=0)
             print(f"X: {X}")
             print(f"Y: {Y}")
 
             # Add data to model
-            emukit_model.set_data(X, Y)
+            emukit_model.set_data(np.array(X), np.array(Y))
 
         self.model = emukit_model
 
@@ -96,12 +96,15 @@ class emu():
         def partial_call(optimise_x):
             return self.call(partial_x+optimise_x)[0]
 
-        # So there is now a second GP modelling the first one: is that what we want?
-        optimise_x = None # TODO: list of variables we want to optimise.
+        optimise_x = [ContinuousParameter('traffic_light_1', 1, 100),
+                      ContinuousParameter('traffic_light_2', 1, 100),
+                      ContinuousParameter('traffic_light_3', 1, 100),
+                      ContinuousParameter('traffic_light_4', 1, 100)]
         bo = GPBayesianOptimization(variables_list=optimise_x,
                             X=X_init, Y=Y_init)
         bo.run_optimization(partial_call, 10)
-        maximum = None # TODO
+
+        maximum = bo.loop_state.X[np.argmax(bo.loop_state.Y)]
         return maximum
 
-emu(1)
+emu(10)
