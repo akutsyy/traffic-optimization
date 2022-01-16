@@ -5,7 +5,7 @@ from emukit.experimental_design.acquisitions import ModelVariance
 from emukit.core.optimization import GradientAcquisitionOptimizer
 from emukit.examples.gp_bayesian_optimization.single_objective_bayesian_optimization import GPBayesianOptimization
 from emukit.core import ParameterSpace, ContinuousParameter, DiscreteParameter
-from xdraft.runner import call_sim
+from runner import call_sim
 
 class emu():
     def __init__(self, iterations):
@@ -13,27 +13,27 @@ class emu():
         Y = np.array([[call_sim(X[0])]])
 
         # Define parameter space for the simulator variables
-        space = ParameterSpace([ContinuousParameter('traffic_light_1', 0, 100),
-                                ContinuousParameter('traffic_light_2', 0, 100),
-                                ContinuousParameter('traffic_light_3', 0, 100),
-                                ContinuousParameter('traffic_light_4', 0, 100),
+        space = ParameterSpace([ContinuousParameter('traffic_light_1', 1, 100),
+                                ContinuousParameter('traffic_light_2', 1, 100),
+                                ContinuousParameter('traffic_light_3', 1, 100),
+                                ContinuousParameter('traffic_light_4', 1, 100),
                                 ContinuousParameter('sigma', 0, 1),
                                 ContinuousParameter('tau', 0, 1000), # Don't know how to do no upper bound
                                 ContinuousParameter('trucks', 0, 100),
                                 ContinuousParameter('cars', 0, 100),
                                 ContinuousParameter('bikes', 0, 100),
-                                ContinuousParameter('NE', 0, 1),
-                                ContinuousParameter('NS', 0, 1),
-                                ContinuousParameter('NW', 0, 1),
-                                ContinuousParameter('EN', 0, 1),
-                                ContinuousParameter('ES', 0, 1),
-                                ContinuousParameter('EW', 0, 1),
-                                ContinuousParameter('SN', 0, 1),
-                                ContinuousParameter('SE', 0, 1),
-                                ContinuousParameter('SW', 0, 1),
-                                ContinuousParameter('WN', 0, 1),
-                                ContinuousParameter('WE', 0, 1),
-                                ContinuousParameter('WS', 0, 1),
+                                ContinuousParameter('NE', 0, 0.5),
+                                ContinuousParameter('NS', 0, 0.5),
+                                ContinuousParameter('NW', 0, 0.5),
+                                ContinuousParameter('EN', 0, 0.5),
+                                ContinuousParameter('ES', 0, 0.5),
+                                ContinuousParameter('EW', 0, 0.5),
+                                ContinuousParameter('SN', 0, 0.5),
+                                ContinuousParameter('SE', 0, 0.5),
+                                ContinuousParameter('SW', 0, 0.5),
+                                ContinuousParameter('WN', 0, 0.5),
+                                ContinuousParameter('WE', 0, 0.5),
+                                ContinuousParameter('WS', 0, 0.5),
                                 ])
 
         # Kernel

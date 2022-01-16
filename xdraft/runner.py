@@ -48,9 +48,9 @@ def set_session():
     session = True
 
 def go():
+    print('test')
     cmd = [sumoBinary, "-c", "inter1.sumocfg", "--start", "--quit-on-end",
            "--summary", "sum.xml", "--tripinfo-output", "tripinfo.xml"]
-    print(cmd)
     if not session:
         traci.start(cmd)
         set_session()
