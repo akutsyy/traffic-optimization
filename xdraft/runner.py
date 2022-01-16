@@ -143,9 +143,6 @@ if __name__ == "__main__":
 
     # this script has been called from the command line. It will start sumo as a
     # server, then connect and run
-<<<<<<< HEAD
-    if not NO_SIM: go()
-=======
+
     if  NO_SIM: go()
     update_network('intersection',[])
->>>>>>> f9d52b9619d9f1043c02c11e487b72d2f0cace61
