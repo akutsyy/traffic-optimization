@@ -11,7 +11,7 @@ TRAFFIC_TYPES = ['car1', 'truck1', 'bike1']
 pd.set_option('display.max_columns', None)
 METRIC = 'meanSpeedRelative'
 
-NO_SIM = True  # skip re-simulating
+NO_SIM = False  # skip re-simulating
 
 # Setup sumo
 if NO_GUI:
@@ -27,7 +27,7 @@ def call_sim(params, network_type='intersection'):
     ret_code = update_network(network_type, params)
     if not ret_code:
         return 0.0
-    go()
+    go(session)
     return get_sum_stats(METRIC)
 
 
@@ -42,11 +42,12 @@ def get_sum_stats(metric='meanSpeedRelative'):
     return metric_out
 
 
-def go():
+def go(session):
     cmd = [sumoBinary, "-c", "inter1.sumocfg", "--start", "--quit-on-end",
            "--summary", "sum.xml", "--tripinfo-output", "tripinfo.xml"]
     if not session:
         traci.start(cmd)
+        session = False
     else:
         traci.load(cmd.remove('--quit-on-end'))
     while traci.simulation.getMinExpectedNumber() > 0:
@@ -63,12 +64,15 @@ def get_props_from_total(total, ratios, selected):
 
 def update_network(network_type, param_list):
     # Must have all routes flowing to stop it falling into just allowing the busiest lane to flow only.
-    if 0 in param_list[0:4]:
+    #Probability values above 0.5 for any traffic type will make the sim take 30+ mins.
+    if 0 in param_list[0:4] or any(z>0.5 for z in param_list[9:]):
         return False
-    param_list = [99,3,106,12,
+
+    #Mock param list:
+    """param_list = [99,3,106,12,
                   0.5,0.5,
                   1,1,1,
-                  0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1]
+                  0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1]"""
     assert len(param_list) == 21
 
     """
@@ -120,7 +124,7 @@ def update_network(network_type, param_list):
     with open('./draft.net.xml') as f:
         root = ET.parse(f)
         for i, phase in enumerate(root.find('tlLogic')):
-            print(phase.attrib, param_list[i], get_props_from_total(1,param_list[0:4],param_list[i]))
+            #print(phase.attrib, param_list[i], get_props_from_total(1,param_list[0:4],param_list[i]))
             phase.set('duration', get_props_from_total(1,param_list[0:4],param_list[i]))
 
     return True
@@ -130,4 +134,4 @@ if __name__ == "__main__":
 
     # this script has been called from the command line. It will start sumo as a
     # server, then connect and run
-    if not NO_SIM: go()
+    if not NO_SIM: go(session)
