@@ -9,7 +9,7 @@ from emukit.core.optimization import GradientAcquisitionOptimizer
 from emukit.examples.gp_bayesian_optimization.single_objective_bayesian_optimization import GPBayesianOptimization
 from emukit.bayesian_optimization.acquisitions import ExpectedImprovement
 from emukit.core import ParameterSpace, ContinuousParameter, DiscreteParameter
-from runner import call_sim
+import runner
 import matplotlib.pyplot as plt
 
 FOURLIGHTS = [ContinuousParameter('traffic_light_1', 1, 100),
@@ -49,13 +49,13 @@ class emu():
 
         # GP
         self.X = np.array([[1, 1, 1, 1]+INITIAL_PARTIAL_VARIABLES])
-        self.Y = np.array([[call_sim(self.X[0])]])
+        self.Y = np.array(runner.call_sim_parallel(self.X))
         self.gpy_model = GPy.models.GPRegression(self.X, self.Y, self.kern, noise_var=1e-10)
         # Emukit Model
         self.model = GPyModelWrapper(self.gpy_model)
 
     # Save to file if given a name
-    def train(self, iterations, save_filename=None):
+    def explore(self, iterations, save_filename=None):
         # Acquisition function
         us_acquisition = ModelVariance(self.model)
         # Acquisition optimiser
@@ -68,7 +68,7 @@ class emu():
             x_new, _ = optimizer.optimize(us_acquisition)
 
             # Run simulator on new
-            y_new = np.array([call_sim(list(x_new[0]))])
+            y_new = np.array([runner.call_sim(list(x_new[0]))])
 
             self.X = np.append(self.X, x_new, axis=0)
             self.Y = np.append(self.Y, np.expand_dims(y_new, 0), axis=0)
@@ -95,7 +95,7 @@ class emu():
         return self.model.predict(x)
 
     # partial_x will be things like number of cars on the road
-    def optimise(self, partial_x, to_optimize=FOURLIGHTS, iterations=10,maximize=True):
+    def optimise(self, partial_x, to_optimize=FOURLIGHTS, iterations=50,maximize=True):
         assert len(partial_x) == 17
         if maximize:
             sign = -1
@@ -129,21 +129,21 @@ def get_emu_from_pickle(filename):
 
 if __name__ == '__main__':
 
-    train_iterations = 200
-    iterations = 30
+    explore_iterations = 10000
+    optimize_iterations = 50
 
     e = emu()
-    e.train(train_iterations,save_filename="emulator_test_200_iterations.pkl")
+    e.explore(explore_iterations, save_filename="emulator_test_many_iterations.pkl")
 
-    max_values, loop_state = e.optimise(INITIAL_PARTIAL_VARIABLES, iterations = iterations)
-    xs = range(iterations+1)
+    max_values, loop_state = e.optimise(INITIAL_PARTIAL_VARIABLES, iterations = optimize_iterations)
+    xs = range(optimize_iterations + 1)
     ys = [-1*y[0] for y in loop_state.Y]
 
     fig, ax = plt.subplots()
     ax.plot(xs,ys)
 
     ax.set(xlabel='Iteration of Bayesian Optimization', ylabel='Mean Speed (% of speed limit)',
-           title='Mean Car Speed After '+str(iterations)+' Iterations of Bayesian Optimization')
+           title='Mean Car Speed After ' + str(optimize_iterations) + ' Iterations of Bayesian Optimization')
     ax.grid()
 
     fig.savefig("bo_results.png")
@@ -163,7 +163,7 @@ if __name__ == '__main__':
         ax.plot(xs,y)
 
     ax.set(xlabel='Iteration of Bayesian Optimization', ylabel='Percent of time spent in each light configuration',
-           title='Traffic Light Configuration After ' + str(iterations) + ' Iterations of Bayesian Optimization')
+           title='Traffic Light Configuration After ' + str(optimize_iterations) + ' Iterations of Bayesian Optimization')
     ax.grid()
     fig.savefig("bo_config.png")
     plt.show()

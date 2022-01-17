@@ -56,7 +56,7 @@ def train_model(max_iterations=250):
 
 
     # Run the loop
-    stopping_condition = FixedIterationsStoppingCondition(i_max = max_iterations)
+    stopping_condition = FixedIterationsStoppingCondition(i_max = 100)
     expdesign_loop.run_loop(f, stopping_condition)
 
     with open('model.pkl','wb') as pw:
@@ -65,7 +65,7 @@ def train_model(max_iterations=250):
 
 
 if __name__ == '__main__':
-    train = False
+    train = True
     if train:
         train_model()
 
