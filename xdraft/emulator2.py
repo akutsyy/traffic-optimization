@@ -12,29 +12,20 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pickle
 
-train = False
+train = True
 if train:
-    space = ParameterSpace([ContinuousParameter('traffic_light_1', 1, 10),
-                                    ContinuousParameter('traffic_light_2', 1, 10),
-                                    ContinuousParameter('traffic_light_3', 1, 10),
-                                    ContinuousParameter('traffic_light_4', 1, 10),
-                                    ContinuousParameter('sigma', 0.5, 0.5),
-                                    ContinuousParameter('tau', 0.5, 0.5),
+    space = ParameterSpace([ContinuousParameter('traffic_light_1', 1, 4),
+                                    ContinuousParameter('traffic_light_2', 1, 4),
+                                    ContinuousParameter('traffic_light_3', 1, 4),
+                                    ContinuousParameter('traffic_light_4', 1, 4),
                                     ContinuousParameter('trucks', 1, 1),
-                                    ContinuousParameter('cars', 2, 2),
+                                    ContinuousParameter('cars', 1, 2),
                                     ContinuousParameter('bikes', 1, 1),
-                                    ContinuousParameter('NE', 0.1, 0.5),
-                                    ContinuousParameter('NS', 0.1, 0.5),
-                                    ContinuousParameter('NW', 0.1, 0.5),
-                                    ContinuousParameter('EN', 0.1, 0.5),
-                                    ContinuousParameter('ES', 0.1, 0.5),
-                                    ContinuousParameter('EW', 0.1, 0.5),
-                                    ContinuousParameter('SN', 0.1, 0.5),
-                                    ContinuousParameter('SE', 0.1, 0.5),
-                                    ContinuousParameter('SW', 0.1, 0.5),
-                                    ContinuousParameter('WN', 0.1, 0.5),
-                                    ContinuousParameter('WE', 0.1, 0.5),
-                                    ContinuousParameter('WS', 0.1, 0.5),
+                                    ContinuousParameter('Heaviness',0,1),
+                                    ContinuousParameter('NB', 0.1, 0.5),
+                                    ContinuousParameter('EB', 0.1, 0.5),
+                                    ContinuousParameter('SB', 0.1, 0.5),
+                                    ContinuousParameter('WB', 0.1, 0.5)
                                     ])
     num_data_points = 30
     f = runner.call_sim_parallel
@@ -107,3 +98,6 @@ plt.plot(xs, predicted_y)
 plt.legend(['True function', 'Estimated function'], loc='lower right')
 plt.fill_between(xs, predicted_y - 2 * predicted_std, predicted_y + 2 * predicted_std, alpha=.5)
 plt.show()
+
+if __name__ == "__main__":
+    print('fish')
