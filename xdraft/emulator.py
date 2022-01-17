@@ -63,7 +63,7 @@ class emu():
             self.model = GPyModelWrapper(gpy_model)
 
     # Save to file if given a name
-    def explore(self, iterations, save_filename=None):
+    def explore(self, iterations,batch_size, save_filename=None):
         # Acquisition function
         us_acquisition = ModelVariance(self.model)
         # Acquisition optimiser
@@ -130,7 +130,7 @@ if __name__ == '__main__':
     picklename = "emulator_test_many_iterations.pkl"
     explore_iterations = 10000
     optimize_iterations = 50
-    from_pickle = True
+    from_pickle = False
 
     if from_pickle:
         e = emu(picklename)

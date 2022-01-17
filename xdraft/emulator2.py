@@ -35,7 +35,7 @@ def train_model(max_iterations=250):
                                     ContinuousParameter('WE', 0.1, 0.5),
                                     ContinuousParameter('WS', 0.1, 0.5),
                                     ])
-    num_data_points = 30
+    num_data_points = 5
     f = runner.call_sim_parallel
     design = RandomDesign(space)
     X = design.get_samples(num_data_points)
@@ -47,7 +47,7 @@ def train_model(max_iterations=250):
     model_gpy.optimize()
     model_emukit = GPyModelWrapper(model_gpy)
     model_variance   = ModelVariance(model = model_emukit)
-    optimizer        = GradientAcquisitionOptimizer(space = space)
+    optimizer = GradientAcquisitionOptimizer(space = space)
     expdesign_loop = ExperimentalDesignLoop(space = space,
                                             model = model_emukit,
                                             acquisition = model_variance,

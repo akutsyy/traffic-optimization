@@ -6,6 +6,7 @@ from scipy import integrate
 import xml.etree.ElementTree as ET
 import os
 import numpy as np
+import multiprocessing as mp
 
 cccc = 0
 
@@ -27,83 +28,93 @@ else:
     sumoBinary = checkBinary('sumo-gui')
 
 
-#MAIN FUNCTION TO CALL SIMULATOR
-#Input: params - 21 length long vector - definition below
-#Returns: Health metric depending on that set above. A higher value for this is better.
+# MAIN FUNCTION TO CALL SIMULATOR
+# Input: params - 21 length long vector - definition below
+# Returns: Health metric depending on that set above. A higher value for this is better.
 
 def call_sim_parallel(dparams):
-    return np.array(list([call_sim(x)] for x in dparams))
-
-def call_sim(params, network_type='intersection', early_stop=False):
-    ret_code = update_network(params)
     global cccc
-    cccc+=1
-    print("ROUND ", cccc)
+    cccc += len(dparams)
+    print("Call number "+str(cccc))
+    pool = mp.Pool(len(dparams))
+    calls = [(x, "number_" + str(i)) for i, x in enumerate(dparams)]
+    out = pool.map(call_sim_zipped,calls)
+    return np.array([[x] for x in out]) # Package into 2D array
+
+
+def call_sim_zipped(zipped):
+    return call_sim(*zipped)
+
+
+def call_sim(params, name="test", network_type='intersection', early_stop=False):
+    ret_code = update_network(params)
     if not ret_code:
         return 0.0
-    grid_pen = go()
+    grid_pen = go(name)
     grid_pen = grid_pen * GRIDLOCK_PENALTY
-    print(params)
-    return get_sum_stats(grid_pen)
+    return get_sum_stats(grid_pen, name)
 
 
-def get_sum_stats(grid_pen,metric='meanSpeedRelative'):
+def get_sum_stats(grid_pen, name, metric='meanSpeedRelative'):
     # metric = one of 'halting-ratio', 'meanTravelTime' or 'meanSpeedRelative'
-    df = pd.read_xml("sum.xml")[:-1]
-    df = df.head(int(len(df)*0.9)).tail(int(len(df)*0.8))
+    df = pd.read_xml("sum_" + str(name) + ".xml")[:-1]
+    df = df.head(int(len(df) * 0.9)).tail(int(len(df) * 0.8))
     if metric == 'halting-ratio':
         df['halting-ratio'] = df['halting'] / df['running']
     metric_out = np.average(df[metric])
-    print(metric_out, " - ", grid_pen, " = ", metric_out-grid_pen)
+    print(metric_out, " - ", grid_pen, " = ", metric_out - grid_pen)
 
-    return max(0,metric_out-grid_pen)
+    return max(0, metric_out - grid_pen)
+
 
 def set_session():
     global session
     session = True
 
 
-def go():
-    if os.path.isfile("sum.xml"):
-        os.remove("sum.xml")
-    cmd = [sumoBinary, "-c", "inter1.sumocfg", "--start","--quit-on-end", "--no-warnings",
-           "--summary", "sum.xml", "--tripinfo-output", "tripinfo.xml", "--time-to-teleport", "-1"]
-    traci.start(cmd)
+def go(name):
+    if os.path.isfile("sum_" + str(name) + ".xml"):
+        os.remove("sum_" + str(name) + ".xml")
+    cmd = [sumoBinary, "-c", "inter1.sumocfg", "--start", "--quit-on-end", "--no-warnings",
+           "--summary", "sum_" + str(name) + ".xml", "--tripinfo-output", "tripinfo_" + str(name) + ".xml",
+           "--time-to-teleport", "-1"]
+    traci.start(cmd, label=name)
+    conn = traci.getConnection(name)
     iterations = 0
 
     last_inb_sp = -1
     last_outb_sp = -1
-    while traci.simulation.getMinExpectedNumber() > 0:
-        traci.simulationStep()
-        iterations +=1
+    while conn.simulation.getMinExpectedNumber() > 0:
+        conn.simulationStep()
+        iterations += 1
         if iterations % 300 == 0:
-            cur_inb_sp = traci.edge.getLastStepMeanSpeed("end1_junction")
-            cur_outb_sp = traci.edge.getLastStepMeanSpeed("junction_end1")
+            cur_inb_sp = conn.edge.getLastStepMeanSpeed("end1_junction")
+            cur_outb_sp = conn.edge.getLastStepMeanSpeed("junction_end1")
 
             if (cur_inb_sp == last_inb_sp and cur_outb_sp == last_outb_sp):
                 print("Gridlock! Breaking...")
-                traci.close()
+                conn.close()
                 return 1
             else:
                 last_outb_sp = cur_outb_sp
                 last_inb_sp = cur_inb_sp
-    traci.close()
+    conn.close()
     return 0
 
 
 # total is total traffic flow on edge, ratios is ratio of proportions
 # e.g. total flow of 10 and truck:car:bike ratio of 5:3:2 = 5 trucks, 3 cars, 2 bikes
-#selected is which ratio element (by value)
+# selected is which ratio element (by value)
 def get_props_from_total(total, ratios, selected):
-    return str(round(total * selected / sum(ratios),5))
+    return str(round(total * selected / sum(ratios), 5))
 
 
-def update_network(param_list):
+def update_network(param_list, savename='test'):
     # Must have all routes flowing to stop it falling into just allowing the busiest lane to flow only.
     if 0 in param_list[0:4]:
         return False
 
-    #Mock param list:
+    # Mock param list:
     try:
         assert len(param_list) == 21
     except:
@@ -129,52 +140,53 @@ def update_network(param_list):
         18: W->N  19: W->E  20: W->S
 
     """
-    #print(list(zip(param_list,range(0,len(param_list)))))
+    # print(list(zip(param_list,range(0,len(param_list)))))
 
     with open(os.path.join(os.path.dirname(__file__), './draft.rou.xml')) as f:
         root = ET.parse(f)
 
         # Update probability of emissions ( = flow):
-        flowdown = min(N_LIMIT, int(N/sum(param_list[9:])))
+        flowdown = min(N_LIMIT, int(N / sum(param_list[9:])))
         for i, n in enumerate(root.iter('flow')):
             # i is the index of the specific ((source,dest),vehicle). There are 3 vehicle types.
             # k is the index into the parameters for the specific source->dest. These do not distinguish by vehicle,
-            #so there are a third of the overall number of flows (i). So i = 3k (trucks) or 3k + 1 (cars) or 3k+2 (bikes)
+            # so there are a third of the overall number of flows (i). So i = 3k (trucks) or 3k + 1 (cars) or 3k+2 (bikes)
             k = i // 3
 
-            #First arg - the overall flow (sum of all vehicle types) which should be assigned to the flow. This is what
-            #is passed in as a parameter for the specific flow - add 9 as this starts from index 9.
-            #Second arg - the ratio values for the three types of vehicle.
-            #Third arg - the ratio value for whichever of the vehicle types are currently being assigned - add 6 as this
-            #starts form index 6. i - 3k = 1 or 2 or 3 i.e. the vehicle type.
-            prob = get_props_from_total(param_list[9+k],param_list[6:9],param_list[6+i-(3*k)])
-            n.set('probability',prob)
+            # First arg - the overall flow (sum of all vehicle types) which should be assigned to the flow. This is what
+            # is passed in as a parameter for the specific flow - add 9 as this starts from index 9.
+            # Second arg - the ratio values for the three types of vehicle.
+            # Third arg - the ratio value for whichever of the vehicle types are currently being assigned - add 6 as this
+            # starts form index 6. i - 3k = 1 or 2 or 3 i.e. the vehicle type.
+            prob = get_props_from_total(param_list[9 + k], param_list[6:9], param_list[6 + i - (3 * k)])
+            n.set('probability', prob)
             n.set('end', str(flowdown))
-            #print(9+k, prob, param_list[9+k],n.attrib)
+            # print(9+k, prob, param_list[9+k],n.attrib)
 
-        #Set tau and sigma for all vTypes
-        #for vType in root.findall('vType'):
-            #print()
-            #vType.set('sigma',str(param_list[4]))
-            #vType.set('tau',str(param_list[5]))
+        # Set tau and sigma for all vTypes
+        # for vType in root.findall('vType'):
+        # print()
+        # vType.set('sigma',str(param_list[4]))
+        # vType.set('tau',str(param_list[5]))
 
-        root.write('./draft.rou.xml')
+        root.write("./" + str(savename) + ".rou.xml")
 
-    #Update the traffic lights
+    # Update the traffic lights
     with open(os.path.join(os.path.dirname(__file__), './draft.net.xml')) as f:
         root = ET.parse(f)
         zs = list(x for x in root.find('tlLogic') if 'y' not in x.get('state'))
         for i, phase in enumerate(zs):
-            #print(phase.attrib, param_list[i], get_props_from_total(1,param_list[0:4],param_list[i]))
-            phase.set('duration', get_props_from_total(60,param_list[0:4],param_list[i]))
-        root.write('./draft.net.xml')
+            # print(phase.attrib, param_list[i], get_props_from_total(1,param_list[0:4],param_list[i]))
+            phase.set('duration', get_props_from_total(60, param_list[0:4], param_list[i]))
+        root.write("./" + str(savename) + ".net.xml")
 
     return True
 
+
 # this is the main entry point of this script
 if __name__ == "__main__":
-    go()
-    get_sum_stats()
+    go("test")
+    get_sum_stats("test")
     """
     # this script has been called from the command line. It will start sumo as a
     # server, then connect and run
