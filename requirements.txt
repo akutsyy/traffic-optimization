@@ -1,0 +1,8 @@
+GPy
+numpy
+emukit
+traci
+pandas
+scipy
+lxml
+# Also requires eclipse SUMO

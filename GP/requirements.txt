@@ -1,6 +1,0 @@
-GPy
-emukit
-pandas==1.3.0
-lxml
-sumolib
-traci

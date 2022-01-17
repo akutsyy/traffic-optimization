@@ -15,24 +15,109 @@ from scenariogeneration import xodr
 import os
 
 # create some simple roads
-from generate_road import post_process
+from post_processing import post_process_generated as post_process
 import generate_road
 
 # create some roads
 roads = []
-roads.append(xodr.create_road(xodr.Line(100), id=0, left_lanes=1, right_lanes=1))
-roads.append(xodr.create_road(xodr.Line(100), id=1, left_lanes=1, right_lanes=1))
 
-roads.append(xodr.create_road(xodr.Line(100), id=2, left_lanes=1, right_lanes=1))
+# create two simple roads to merge
+roads.append(xodr.create_road(xodr.Line(100), id=0, left_lanes=0, right_lanes=2))
+roads.append(xodr.create_road(xodr.Line(100), id=1, left_lanes=0, right_lanes=1))
+
+# manually create the final road
+
+
+# create the planview and the geometry
+planview = xodr.PlanView()
+planview.add_geometry(xodr.Line(200))
+
+# create two different roadmarkings
+rm_solid = xodr.RoadMark(xodr.RoadMarkType.solid, 0.2)
+rm_dashed = xodr.RoadMark(xodr.RoadMarkType.broken, 0.2)
+
+# create a centerlane (same centerlane can be used since no linking is needed for this)
+centerlane = xodr.Lane(a=2)
+centerlane.add_roadmark(rm_solid)
+
+# create the first lanesection with three lanes
+lanesec1 = xodr.LaneSection(0, centerlane)
+lane1 = xodr.Lane(a=3)
+lane1.add_roadmark(rm_dashed)
+
+lane2 = xodr.Lane(a=3)
+lane2.add_roadmark(rm_dashed)
+
+lane3 = xodr.Lane(a=3)
+lane3.add_roadmark(rm_solid)
+
+lanesec1.add_right_lane(lane1)
+lanesec1.add_right_lane(lane2)
+lanesec1.add_right_lane(lane3)
+
+# create the second lanesection with one lane merging
+lanesec2 = xodr.LaneSection(70, centerlane)
+lane4 = xodr.Lane(a=3)
+lane4.add_roadmark(rm_dashed)
+
+lane5 = xodr.Lane(a=3)
+lane5.add_roadmark(rm_dashed)
+
+lane6 = xodr.Lane(a=3, b=-0.1)
+lane6.add_roadmark(rm_solid)
+
+lanesec2.add_right_lane(lane4)
+lanesec2.add_right_lane(lane5)
+lanesec2.add_right_lane(lane6)
+
+# create the last lanesection with one lane
+lanesec3 = xodr.LaneSection(100, centerlane)
+
+lane7 = xodr.Lane(a=3)
+lane7.add_roadmark(rm_dashed)
+
+lane8 = xodr.Lane(a=3)
+lane8.add_roadmark(rm_solid)
+
+lanesec3.add_right_lane(lane7)
+lanesec3.add_right_lane(lane8)
+
+# create the lane links
+lanelinker = xodr.LaneLinker()
+lanelinker.add_link(predlane=lane1, succlane=lane4)
+lanelinker.add_link(predlane=lane2, succlane=lane5)
+lanelinker.add_link(predlane=lane3, succlane=lane6)
+
+lanelinker.add_link(predlane=lane5, succlane=lane7)
+lanelinker.add_link(predlane=lane6, succlane=lane8)
+
+# create the lanes with the correct links
+lanes = xodr.Lanes()
+lanes.add_lanesection(lanesec1, lanelinker)
+lanes.add_lanesection(lanesec2, lanelinker)
+lanes.add_lanesection(lanesec3, lanelinker)
+
+# create the road
+roads.append(xodr.Road(2, planview, lanes))
+
+# create junction roads
+roads.append(xodr.create_road(xodr.Spiral(0.001, 0.02, 30), id=3, left_lanes=0, right_lanes=2, road_type=1))
+roads.append(xodr.create_road(xodr.Spiral(-0.001, -0.02, 30), id=4, left_lanes=0, right_lanes=1, road_type=1))
 
 # add some connections to non junction roads
 roads[0].add_successor(xodr.ElementType.junction, 1)
-roads[1].add_predecessor(xodr.ElementType.junction, 1)
+roads[1].add_successor(xodr.ElementType.junction, 1)
+roads[2].add_predecessor(xodr.ElementType.junction, 1)
 
-roads[2].add_predecessor(xodr.ElementType.road,0,contact_point=xodr.ContactPoint.end)
-roads[2].add_successor(xodr.ElementType.road,1,contact_point=xodr.ContactPoint.start)
+# add connections to the first connecting road
+roads[3].add_predecessor(xodr.ElementType.road, 0, xodr.ContactPoint.end)
+roads[3].add_successor(xodr.ElementType.road, 2, xodr.ContactPoint.start)
 
-junction = xodr.create_junction([roads[2]], 1, [roads[0], roads[1]])
+# add connections to the second connecting road with an offset
+roads[4].add_predecessor(xodr.ElementType.road, 1, xodr.ContactPoint.end)
+roads[4].add_successor(xodr.ElementType.road, 2, xodr.ContactPoint.start, lane_offset=-2)
+
+junction = xodr.create_junction(roads[3:], 1, roads[0:3])
 
 # create the opendrive
 odr = xodr.OpenDrive('myroad')

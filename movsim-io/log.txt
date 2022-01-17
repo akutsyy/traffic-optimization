@@ -3,73 +3,18 @@ esmini GIT TAG: v2.18.2
 esmini GIT BRANCH: tags/v2.18.2^0
 esmini BUILD VERSION: 2.18.2.build.2034
 Added path esmini-linux/resources/xosc
-Generated seed 1387582743
-density: 15.00
+Generated seed 4246148574
+density: 0.00
 global speed factor: 1.00
+Expected element type ROAD, found 2
+Expected element type ROAD, found 2
+Expected element type ROAD, found 2
+Expected element type ROAD, found 2
+Info: Junction id 108, referred to by road 124, does not exist
+Info: Junction id 109, referred to by road 125, does not exist
+Info: Junction id 110, referred to by road 126, does not exist
+Info: Junction id 111, referred to by road 127, does not exist
 Type of roads are missing, cannot determine for OSI intersection or not, assuming that it is an intersection.
 No scenegraph 3D model loaded. Generating a simplistic one...
 osi_features: lines off points off
-Failed to load visual model car_red.osgb. Also tried the following paths:
-    ./esmini-linux/bin/../resources/models/./car_red.osgb
-    esmini-linux/resources/xosc/./car_red.osgb
-    esmini-linux/resources/xosc/../models/car_red.osgb
-    esmini-linux/resources/xosc/./car_red.osgb
-    generated/xodr/./car_red.osgb
-    generated/xodr/../models/car_red.osgb
-    generated/xodr/./car_red.osgb
-Creating a dummy model instead
-Failed to load visual model car_yellow.osgb. Also tried the following paths:
-    ./esmini-linux/bin/../resources/models/./car_yellow.osgb
-    esmini-linux/resources/xosc/./car_yellow.osgb
-    esmini-linux/resources/xosc/../models/car_yellow.osgb
-    esmini-linux/resources/xosc/./car_yellow.osgb
-    generated/xodr/./car_yellow.osgb
-    generated/xodr/../models/car_yellow.osgb
-    generated/xodr/./car_yellow.osgb
-Creating a dummy model instead
-Failed to load visual model truck_yellow.osgb. Also tried the following paths:
-    ./esmini-linux/bin/../resources/models/./truck_yellow.osgb
-    esmini-linux/resources/xosc/./truck_yellow.osgb
-    esmini-linux/resources/xosc/../models/truck_yellow.osgb
-    esmini-linux/resources/xosc/./truck_yellow.osgb
-    generated/xodr/./truck_yellow.osgb
-    generated/xodr/../models/truck_yellow.osgb
-    generated/xodr/./truck_yellow.osgb
-Creating a dummy model instead
-Failed to load visual model car_blue.osgb. Also tried the following paths:
-    ./esmini-linux/bin/../resources/models/./car_blue.osgb
-    esmini-linux/resources/xosc/./car_blue.osgb
-    esmini-linux/resources/xosc/../models/car_blue.osgb
-    esmini-linux/resources/xosc/./car_blue.osgb
-    generated/xodr/./car_blue.osgb
-    generated/xodr/../models/car_blue.osgb
-    generated/xodr/./car_blue.osgb
-Creating a dummy model instead
-Failed to load visual model van_red.osgb. Also tried the following paths:
-    ./esmini-linux/bin/../resources/models/./van_red.osgb
-    esmini-linux/resources/xosc/./van_red.osgb
-    esmini-linux/resources/xosc/../models/van_red.osgb
-    esmini-linux/resources/xosc/./van_red.osgb
-    generated/xodr/./van_red.osgb
-    generated/xodr/../models/van_red.osgb
-    generated/xodr/./van_red.osgb
-Creating a dummy model instead
-Failed to load visual model car_white.osgb. Also tried the following paths:
-    ./esmini-linux/bin/../resources/models/./car_white.osgb
-    esmini-linux/resources/xosc/./car_white.osgb
-    esmini-linux/resources/xosc/../models/car_white.osgb
-    esmini-linux/resources/xosc/./car_white.osgb
-    generated/xodr/./car_white.osgb
-    generated/xodr/../models/car_white.osgb
-    generated/xodr/./car_white.osgb
-Creating a dummy model instead
-Failed to load visual model bus_blue.osgb. Also tried the following paths:
-    ./esmini-linux/bin/../resources/models/./bus_blue.osgb
-    esmini-linux/resources/xosc/./bus_blue.osgb
-    esmini-linux/resources/xosc/../models/bus_blue.osgb
-    esmini-linux/resources/xosc/./bus_blue.osgb
-    generated/xodr/./bus_blue.osgb
-    generated/xodr/../models/bus_blue.osgb
-    generated/xodr/./bus_blue.osgb
-Creating a dummy model instead
-29 cars added
+0 cars added
