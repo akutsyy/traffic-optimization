@@ -18,41 +18,49 @@ FOURLIGHTS = [ContinuousParameter('traffic_light_1', 1, 100),
               ContinuousParameter('traffic_light_4', 1, 100)]
 
 INITIAL_PARTIAL_VARIABLES = [0.5, 0.5, 1, 1, 1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+
+
 class emu():
-    def __init__(self):
+    def __init__(self, from_pickle=None):
+
 
         # Define parameter space for the simulator variables
         self.space = ParameterSpace([ContinuousParameter('traffic_light_1', 1, 10),
-                                ContinuousParameter('traffic_light_2', 1, 10),
-                                ContinuousParameter('traffic_light_3', 1, 10),
-                                ContinuousParameter('traffic_light_4', 1, 10),
-                                ContinuousParameter('sigma', 0.5, 0.5),
-                                ContinuousParameter('tau', 0.5, 0.5),
-                                ContinuousParameter('trucks', 1, 1),
-                                ContinuousParameter('cars', 1, 1),
-                                ContinuousParameter('bikes', 1, 1),
-                                ContinuousParameter('NE', 0.01, 0.5),
-                                ContinuousParameter('NS', 0.01, 0.5),
-                                ContinuousParameter('NW', 0.01, 0.5),
-                                ContinuousParameter('EN', 0.01, 0.5),
-                                ContinuousParameter('ES', 0.01, 0.5),
-                                ContinuousParameter('EW', 0.01, 0.5),
-                                ContinuousParameter('SN', 0.01, 0.5),
-                                ContinuousParameter('SE', 0.01, 0.5),
-                                ContinuousParameter('SW', 0.01, 0.5),
-                                ContinuousParameter('WN', 0.01, 0.5),
-                                ContinuousParameter('WE', 0.01, 0.5),
-                                ContinuousParameter('WS', 0.01, 0.5),
-                                ])
+                                     ContinuousParameter('traffic_light_2', 1, 10),
+                                     ContinuousParameter('traffic_light_3', 1, 10),
+                                     ContinuousParameter('traffic_light_4', 1, 10),
+                                     ContinuousParameter('sigma', 0.5, 0.5),
+                                     ContinuousParameter('tau', 0.5, 0.5),
+                                     ContinuousParameter('trucks', 1, 1),
+                                     ContinuousParameter('cars', 1, 1),
+                                     ContinuousParameter('bikes', 1, 1),
+                                     ContinuousParameter('NE', 0.01, 0.5),
+                                     ContinuousParameter('NS', 0.01, 0.5),
+                                     ContinuousParameter('NW', 0.01, 0.5),
+                                     ContinuousParameter('EN', 0.01, 0.5),
+                                     ContinuousParameter('ES', 0.01, 0.5),
+                                     ContinuousParameter('EW', 0.01, 0.5),
+                                     ContinuousParameter('SN', 0.01, 0.5),
+                                     ContinuousParameter('SE', 0.01, 0.5),
+                                     ContinuousParameter('SW', 0.01, 0.5),
+                                     ContinuousParameter('WN', 0.01, 0.5),
+                                     ContinuousParameter('WE', 0.01, 0.5),
+                                     ContinuousParameter('WS', 0.01, 0.5),
+                                     ])
         # Kernel
-        self.kern = GPy.kern.RBF(21, lengthscale=0.08, variance=20)
+        kern = GPy.kern.RBF(21, lengthscale=0.08, variance=20)
 
         # GP
-        self.X = np.array([[1, 1, 1, 1]+INITIAL_PARTIAL_VARIABLES])
+        self.X = np.array([[1, 1, 1, 1] + INITIAL_PARTIAL_VARIABLES])
         self.Y = np.array(runner.call_sim_parallel(self.X))
-        self.gpy_model = GPy.models.GPRegression(self.X, self.Y, self.kern, noise_var=1e-10)
+        gpy_model = GPy.models.GPRegression(self.X, self.Y, kern, noise_var=1e-10)
         # Emukit Model
-        self.model = GPyModelWrapper(self.gpy_model)
+        if from_pickle:
+            with open(from_pickle, 'rb') as f:
+                self.model = pickle.load(f)
+                print("Successfullly unpickled")
+        else:
+            self.model = GPyModelWrapper(gpy_model)
 
     # Save to file if given a name
     def explore(self, iterations, save_filename=None):
@@ -62,7 +70,6 @@ class emu():
         optimizer = GradientAcquisitionOptimizer(self.space)
 
         for i in range(iterations):
-            print("Iteration "+str(i))
             # Get next point
             global x_new
             x_new, _ = optimizer.optimize(us_acquisition)
@@ -79,23 +86,22 @@ class emu():
             # Add data to model
             self.model.set_data(np.array(self.X), np.array(self.Y))
 
-            if i % 10 and save_filename:
+            if i % 10 == 9 and save_filename:
                 with open(save_filename, 'wb') as pw:
-                    pickle.dump(self, pw)
-                    print("Dumped model succesfully at iteration "+str(i))
+                    pickle.dump(self.model, pw)
+                    print("Dumped model succesfully at iteration " + str(i))
 
         if save_filename:
             with open(save_filename, 'wb') as pw:
-                pickle.dump(self, pw)
+                pickle.dump(self.model, pw)
                 print("Dumped model succesfully at last iteration")
-
 
     def call(self, x):
         # Returns tuple of mean and variance
         return self.model.predict(x)
 
     # partial_x will be things like number of cars on the road
-    def optimise(self, partial_x, to_optimize=FOURLIGHTS, iterations=50,maximize=True):
+    def optimise(self, partial_x, to_optimize=FOURLIGHTS, iterations=50, maximize=True):
         assert len(partial_x) == 17
         if maximize:
             sign = -1
@@ -104,7 +110,7 @@ class emu():
 
         # optimise_x are the parameters to optimise
         def partial_call(optimise_x):
-            return sign*self.call(np.expand_dims(np.append(optimise_x, partial_x), axis=0))[0]
+            return sign * self.call(np.expand_dims(np.append(optimise_x, partial_x), axis=0))[0]
 
         user_function = UserFunctionWrapper(partial_call)
         x_init = np.array([np.ones(len(to_optimize))])
@@ -114,33 +120,30 @@ class emu():
                                     X=x_init, Y=y_init)
         bo.run_optimization(user_function, iterations)
 
-
         print(bo.loop_state.X)
         print(bo.loop_state.Y)
         print(bo.loop_state.results)
         maximum = bo.loop_state.X[-1]
         return maximum, bo.loop_state
 
-def get_emu_from_pickle(filename):
-    with open(filename,'rb') as pw:
-        emu = pickle.load(pw)
-        print("loaded model")
-        return emu
-
 if __name__ == '__main__':
-
+    picklename = "emulator_test_many_iterations.pkl"
     explore_iterations = 10000
     optimize_iterations = 50
+    from_pickle = True
 
-    e = emu()
-    e.explore(explore_iterations, save_filename="emulator_test_many_iterations.pkl")
+    if from_pickle:
+        e = emu(picklename)
+    else:
+        e = emu()
+        e.explore(explore_iterations, save_filename=picklename)
 
-    max_values, loop_state = e.optimise(INITIAL_PARTIAL_VARIABLES, iterations = optimize_iterations)
+    max_values, loop_state = e.optimise(INITIAL_PARTIAL_VARIABLES, iterations=optimize_iterations)
     xs = range(optimize_iterations + 1)
-    ys = [-1*y[0] for y in loop_state.Y]
+    ys = [-1 * y[0] for y in loop_state.Y]
 
     fig, ax = plt.subplots()
-    ax.plot(xs,ys)
+    ax.plot(xs, ys)
 
     ax.set(xlabel='Iteration of Bayesian Optimization', ylabel='Mean Speed (% of speed limit)',
            title='Mean Car Speed After ' + str(optimize_iterations) + ' Iterations of Bayesian Optimization')
@@ -155,15 +158,16 @@ if __name__ == '__main__':
     newys = []
     for y in ys:
         sum = np.sum(y)
-        newys.append(100*y/sum)
+        newys.append(100 * y / sum)
     ys = np.array(newys).transpose()
     print(ys)
 
     for y in ys:
-        ax.plot(xs,y)
+        ax.plot(xs, y)
 
     ax.set(xlabel='Iteration of Bayesian Optimization', ylabel='Percent of time spent in each light configuration',
-           title='Traffic Light Configuration After ' + str(optimize_iterations) + ' Iterations of Bayesian Optimization')
+           title='Traffic Light Configuration After ' + str(
+               optimize_iterations) + ' Iterations of Bayesian Optimization')
     ax.grid()
     fig.savefig("bo_config.png")
     plt.show()
