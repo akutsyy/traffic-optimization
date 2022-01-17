@@ -20,7 +20,7 @@ def train_model(max_iterations=250):
                                     ContinuousParameter('sigma', 0.5, 0.5),
                                     ContinuousParameter('tau', 0.5, 0.5),
                                     ContinuousParameter('trucks', 1, 1),
-                                    ContinuousParameter('cars', 1, 1),
+                                    ContinuousParameter('cars', 2, 2),
                                     ContinuousParameter('bikes', 1, 1),
                                     ContinuousParameter('NE', 0.1, 0.5),
                                     ContinuousParameter('NS', 0.1, 0.5),
