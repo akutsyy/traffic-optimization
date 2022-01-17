@@ -116,21 +116,6 @@ class emu():
         maximum = bo.loop_state.X[np.argmax(bo.loop_state.Y)]
         return maximum
 
-    def new_optimise(self, partial_x):
-        assert len(partial_x) == 17
-
-        # Four dimensional GP for modelling changes in traffic lights for partial_x
-        gpy_model = GPy.models.GPRegression(None, None, GPy.kern.RBF(4, lengthscale=0.08, variance=20), noise_var=1e-10)
-        emukit_model = GPyModelWrapper(gpy_model)
-
-        aq = ExpectedImprovement(emukit_model)
-        space = ParameterSpace([ContinuousParameter('traffic_light_1', 1, 100),
-                                ContinuousParameter('traffic_light_2', 1, 100),
-                                ContinuousParameter('traffic_light_3', 1, 100),
-                                ContinuousParameter('traffic_light_4', 1, 100),
-                                ])
-        optimizer = GradientAcquisitionOptimizer(space)
-
 e = emu(20)
 #x_plt = np.linspace(0,100,1000)[:, None]
 #rest = np.array([[1,1,1,0.5,0.5,1,1,1,0.9,0.9,0.9,0.9,0.9,0.45,0.45,0.45,0.1,0.1,0.1,0.1]]*1000)
