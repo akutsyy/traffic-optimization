@@ -75,7 +75,7 @@ else:
 #Get some sample vals for plotting how it does
 #For all these, assume everything bar traffic light #1 is fixed, i.e.:
 
-fixed_params = [3,3,3,0.5, 0.5, 1, 1, 1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+fixed_params = [3,3,3,0.5,0.5, 1, 2, 1, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3]
 #Then pick values for the 4 traffic light times:
 xs = []
 for i in range(1,44,1):
@@ -96,13 +96,13 @@ for x in xs:
 predicted_y = np.array(predicted_y).flatten()
 print(predicted_y)
 predicted_std = np.array(predicted_std).flatten()
-real_ys = runner.call_sim_parallel(xs)
+#real_ys = runner.call_sim_parallel(xs)
 
 plt.title('Learning function sin(x) with Emukit')
 plt.xlabel('x')
 plt.ylabel('y', rotation=None)
 xs = list(map(lambda x: x/4, range(1,44,1)))
-plt.plot(xs, real_ys, c='r', )
+#plt.plot(xs, real_ys, c='r', )
 plt.plot(xs, predicted_y)
 plt.legend(['True function', 'Estimated function'], loc='lower right')
 plt.fill_between(xs, predicted_y - 2 * predicted_std, predicted_y + 2 * predicted_std, alpha=.5)

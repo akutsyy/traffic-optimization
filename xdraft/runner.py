@@ -16,7 +16,8 @@ METRIC = 'meanSpeedRelative'
 GRIDLOCK_PENALTY = 0.1
 
 N_LIMIT = 3600
-N = 2000
+N = 1000
+N_reweight = 1.5
 
 NO_SIM = True  # skip re-simulating
 
@@ -56,7 +57,7 @@ def get_sum_stats(grid_pen,metric='meanSpeedRelative'):
     metric_out = np.average(df[metric])
     print(metric_out, " - ", grid_pen, " = ", metric_out-grid_pen)
 
-    return max(0,metric_out-grid_pen)
+    return metric_out
 
 def set_session():
     global session
