@@ -11,19 +11,19 @@ import matplotlib.pyplot as plt
 
 class emu():
     def __init__(self, iterations):
-        self.X = np.array([[1, 1, 1, 1, 0, 0.01, 2, 2, 2, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]])
+        self.X = np.array([[1, 1, 1, 1, 0.5, 0.5, 1, 1, 1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]])
         self.Y = np.array([[call_sim(self.X[0])]])
 
         # Define parameter space for the simulator variables
-        space = ParameterSpace([ContinuousParameter('traffic_light_1', 1, 100),
-                                ContinuousParameter('traffic_light_2', 1, 100),
-                                ContinuousParameter('traffic_light_3', 1, 100),
-                                ContinuousParameter('traffic_light_4', 1, 100),
-                                ContinuousParameter('sigma', 0, 1),
-                                ContinuousParameter('tau', 0.01, 100), # Don't know how to do no upper bound
-                                ContinuousParameter('trucks', 0, 100),
-                                ContinuousParameter('cars', 0, 100),
-                                ContinuousParameter('bikes', 0, 100),
+        space = ParameterSpace([ContinuousParameter('traffic_light_1', 1, 10),
+                                ContinuousParameter('traffic_light_2', 1, 10),
+                                ContinuousParameter('traffic_light_3', 1, 10),
+                                ContinuousParameter('traffic_light_4', 1, 10),
+                                ContinuousParameter('sigma', 0.5, 0.5),
+                                ContinuousParameter('tau', 0.5, 0.5), # Don't know how to do no upper bound
+                                ContinuousParameter('trucks', 1, 1),
+                                ContinuousParameter('cars', 1, 1),
+                                ContinuousParameter('bikes', 1, 1),
                                 ContinuousParameter('NE', 0.01, 0.5),
                                 ContinuousParameter('NS', 0.01, 0.5),
                                 ContinuousParameter('NW', 0.01, 0.5),
@@ -131,7 +131,7 @@ class emu():
                                 ])
         optimizer = GradientAcquisitionOptimizer(space)
 
-e = emu(300)
+e = emu(20)
 #x_plt = np.linspace(0,100,1000)[:, None]
 #rest = np.array([[1,1,1,0.5,0.5,1,1,1,0.9,0.9,0.9,0.9,0.9,0.45,0.45,0.45,0.1,0.1,0.1,0.1]]*1000)
 #y_plt, y_var = e.call(np.append(x_plt, rest, axis=1))
@@ -140,4 +140,4 @@ e = emu(300)
 #plt.xlim((0,100))
 #plt.ylim((-50,50))
 #plt.show()
-print(e.optimise([0.5,0.5,1,1,1,0.9,0.9,0.9,0.9,0.9,0.45,0.45,0.45,0.1,0.1,0.1,0.1], iterations = 100))
+print(e.optimise([0.5, 0.5, 1, 1, 1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1], iterations = 100))
