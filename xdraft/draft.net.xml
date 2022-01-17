@@ -93,13 +93,13 @@
     </edge>
 
     <tlLogic id="junction" offset="0" programID="1" type="static">
-        <phase duration="15.0" state="GGrGrrGGrGrr" />
+        <phase duration="9.08467" state="GGrGrrGGrGrr" />
         <phase duration="19.45946" state="GyrGrrGyrGrr" />
-        <phase duration="15.0" state="GrrGGrGrrGGr" />
+        <phase duration="30.62149" state="GrrGGrGrrGGr" />
         <phase duration="19.45946" state="GrrGyrGrrGyr" />
-        <phase duration="15.0" state="GrGGrrGrGGrr" />
+        <phase duration="12.79767" state="GrGGrrGrGGrr" />
         <phase duration="3.24324" state="GryGrrGryGrr" />
-        <phase duration="15.0" state="GrrGrGGrrGrG" />
+        <phase duration="7.49617" state="GrrGrGGrrGrG" />
         <phase duration="6.48649" state="GrrGryGrrGry" />
     </tlLogic>
 

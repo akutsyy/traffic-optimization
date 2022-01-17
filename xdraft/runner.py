@@ -47,7 +47,7 @@ def call_sim_zipped(zipped):
 
 
 def call_sim(params, name="test", network_type='intersection', early_stop=False):
-    ret_code = update_network(params)
+    ret_code = update_network(params,name)
     if not ret_code:
         return 0.0
     update_sumoconfig(name)
@@ -57,7 +57,7 @@ def call_sim(params, name="test", network_type='intersection', early_stop=False)
 
 def get_sum_stats(grid_pen, name, metric='meanSpeedRelative'):
     # metric = one of 'halting-ratio', 'meanTravelTime' or 'meanSpeedRelative'
-    df = pd.read_xml("sum_" + str(name) + ".xml")[:-1]
+    df = pd.read_xml("in_use_files/sum_" + str(name) + ".xml")[:-1]
     df = df.head(int(len(df) * 0.9)).tail(int(len(df) * 0.8))
     if metric == 'halting-ratio':
         df['halting-ratio'] = df['halting'] / df['running']
@@ -73,10 +73,10 @@ def set_session():
 
 
 def go(name):
-    if os.path.isfile("sum_" + str(name) + ".xml"):
-        os.remove("sum_" + str(name) + ".xml")
-    cmd = [sumoBinary, "-c", "inter1.sumocfg", "--start", "--quit-on-end", "--no-warnings",
-           "--summary", "sum_" + str(name) + ".xml", "--tripinfo-output", "tripinfo_" + str(name) + ".xml",
+    if os.path.isfile("in_use_files/sum_" + str(name) + ".xml"):
+        os.remove("in_use_files/sum_" + str(name) + ".xml")
+    cmd = [sumoBinary, "-c", "in_use_files/"+str(name)+".sumocfg", "--start", "--quit-on-end", "--no-warnings",
+           "--summary", "in_use_files/sum_" + str(name) + ".xml", "--tripinfo-output", "in_use_files/tripinfo_" + str(name) + ".xml",
            "--time-to-teleport", "-1"]
     traci.start(cmd, label=name)
     conn = traci.getConnection(name)
@@ -109,10 +109,10 @@ def get_props_from_total(total, ratios, selected):
     return str(round(total * selected / sum(ratios), 5))
 
 def update_sumoconfig(name):
-    with open(os.path.join(os.path.dirname(__file__), './inter1.sumocfg'),'r') as f:
+    with open('./inter1.sumocfg','r') as f:
         s = f.read()
         s = s.replace("draft",str(name))
-        with open(os.path.join(os.path.dirname(__file__), "./"+str(name)+".sumocfg"),'w+') as f2:
+        with open("./in_use_files/"+str(name)+".sumocfg",'w+') as f2:
             f2.write(s)
 
 def update_network(param_list, savename='test'):
@@ -148,7 +148,7 @@ def update_network(param_list, savename='test'):
     """
     # print(list(zip(param_list,range(0,len(param_list)))))
 
-    with open(os.path.join(os.path.dirname(__file__), './draft.rou.xml')) as f:
+    with open('./draft.rou.xml') as f:
         root = ET.parse(f)
 
         # Update probability of emissions ( = flow):
@@ -175,16 +175,16 @@ def update_network(param_list, savename='test'):
         # vType.set('sigma',str(param_list[4]))
         # vType.set('tau',str(param_list[5]))
 
-        root.write("./" + str(savename) + ".rou.xml")
+        root.write("./in_use_files/" + str(savename) + ".rou.xml")
 
     # Update the traffic lights
-    with open(os.path.join(os.path.dirname(__file__), './draft.net.xml')) as f:
+    with open('./draft.net.xml') as f:
         root = ET.parse(f)
         zs = list(x for x in root.find('tlLogic') if 'y' not in x.get('state'))
         for i, phase in enumerate(zs):
             # print(phase.attrib, param_list[i], get_props_from_total(1,param_list[0:4],param_list[i]))
             phase.set('duration', get_props_from_total(60, param_list[0:4], param_list[i]))
-        root.write("./" + str(savename) + ".net.xml")
+        root.write("./in_use_files/" + str(savename) + ".net.xml")
 
     return True
 
