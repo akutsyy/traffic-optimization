@@ -1,0 +1,62 @@
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <vType guiShape="truck" id="truck1" sigma="0.5" tau="1" vClass="truck" />
+    <vType guiShape="passenger" id="car1" sigma="0.5" tau="1" />
+    
+    <vType guiShape="bicycle" id="bike1" sigma="0.5" tau="1" vClass="bicycle" />
+    
+
+    
+    <flow begin="0.00" departLane="random" end="259.6309117070809" from="end1_junction" id="flow12c" probability="0.04108" to="junction_end2" type="car1" />
+    <flow begin="0.00" departLane="random" end="259.6309117070809" from="end1_junction" id="flow13c" probability="0.18862" to="junction_end3" type="car1" />
+	<flow begin="0.00" departLane="random" end="259.6309117070809" from="end1_junction" id="flow14c" probability="0.0523" to="junction_end4" type="car1" />
+
+	<flow begin="0.00" departLane="random" end="259.6309117070809" from="end1_junction" id="flow12t" probability="0.06351" to="junction_end2" type="truck1" />
+    <flow begin="0.00" departLane="random" end="259.6309117070809" from="end1_junction" id="flow13t" probability="0.29162" to="junction_end3" type="truck1" />
+    <flow begin="0.00" departLane="random" end="259.6309117070809" from="end1_junction" id="flow14t" probability="0.08086" to="junction_end4" type="truck1" />
+
+	<flow begin="0.00" departLane="random" end="259.6309117070809" from="end1_junction" id="flow12b" probability="0.04108" to="junction_end2" type="bike1" />
+    <flow begin="0.00" departLane="random" end="259.6309117070809" from="end1_junction" id="flow13b" probability="0.18862" to="junction_end3" type="bike1" />
+    <flow begin="0.00" departLane="random" end="259.6309117070809" from="end1_junction" id="flow14b" probability="0.0523" to="junction_end4" type="bike1" />
+
+
+    <flow begin="0.00" departLane="random" end="259.6309117070809" from="end2_junction" id="flow21c" probability="0.04353" to="junction_end1" type="car1" />
+    <flow begin="0.00" departLane="random" end="259.6309117070809" from="end2_junction" id="flow23c" probability="0.18671" to="junction_end3" type="car1" />
+    <flow begin="0.00" departLane="random" end="259.6309117070809" from="end2_junction" id="flow24c" probability="0.05177" to="junction_end4" type="car1" />
+
+	<flow begin="0.00" departLane="random" end="259.6309117070809" from="end2_junction" id="flow21t" probability="0.06729" to="junction_end1" type="truck1" />
+    <flow begin="0.00" departLane="random" end="259.6309117070809" from="end2_junction" id="flow23t" probability="0.28866" to="junction_end3" type="truck1" />
+    <flow begin="0.00" departLane="random" end="259.6309117070809" from="end2_junction" id="flow24t" probability="0.08004" to="junction_end4" type="truck1" />
+
+	<flow begin="0.00" departLane="random" end="259.6309117070809" from="end2_junction" id="flow21b" probability="0.04353" to="junction_end1" type="bike1" />
+    <flow begin="0.00" departLane="random" end="259.6309117070809" from="end2_junction" id="flow23b" probability="0.18671" to="junction_end3" type="bike1" />
+    <flow begin="0.00" departLane="random" end="259.6309117070809" from="end2_junction" id="flow24b" probability="0.05177" to="junction_end4" type="bike1" />
+
+
+    <flow begin="0.00" departLane="random" end="259.6309117070809" from="end3_junction" id="flow31c" probability="0.09028" to="junction_end1" type="car1" />
+    <flow begin="0.00" departLane="random" end="259.6309117070809" from="end3_junction" id="flow32c" probability="0.08434" to="junction_end2" type="car1" />
+    <flow begin="0.00" departLane="random" end="259.6309117070809" from="end3_junction" id="flow34c" probability="0.10738" to="junction_end4" type="car1" />
+
+	<flow begin="0.00" departLane="random" end="259.6309117070809" from="end3_junction" id="flow31t" probability="0.13958" to="junction_end1" type="truck1" />
+    <flow begin="0.00" departLane="random" end="259.6309117070809" from="end3_junction" id="flow32t" probability="0.13039" to="junction_end2" type="truck1" />
+    <flow begin="0.00" departLane="random" end="259.6309117070809" from="end3_junction" id="flow34t" probability="0.16602" to="junction_end4" type="truck1" />
+
+	<flow begin="0.00" departLane="random" end="259.6309117070809" from="end3_junction" id="flow31b" probability="0.09028" to="junction_end1" type="bike1" />
+    <flow begin="0.00" departLane="random" end="259.6309117070809" from="end3_junction" id="flow32b" probability="0.08434" to="junction_end2" type="bike1" />
+    <flow begin="0.00" departLane="random" end="259.6309117070809" from="end3_junction" id="flow34b" probability="0.10738" to="junction_end4" type="bike1" />
+
+
+    <flow begin="0.00" departLane="random" end="259.6309117070809" from="end4_junction" id="flow41c" probability="0.04531" to="junction_end1" type="car1" />
+    <flow begin="0.00" departLane="random" end="259.6309117070809" from="end4_junction" id="flow42c" probability="0.04233" to="junction_end2" type="car1" />
+    <flow begin="0.00" departLane="random" end="259.6309117070809" from="end4_junction" id="flow43c" probability="0.19436" to="junction_end3" type="car1" />
+
+	<flow begin="0.00" departLane="random" end="259.6309117070809" from="end4_junction" id="flow41t" probability="0.07005" to="junction_end1" type="truck1" />
+    <flow begin="0.00" departLane="random" end="259.6309117070809" from="end4_junction" id="flow42t" probability="0.06544" to="junction_end2" type="truck1" />
+    <flow begin="0.00" departLane="random" end="259.6309117070809" from="end4_junction" id="flow43t" probability="0.3005" to="junction_end3" type="truck1" />
+
+	<flow begin="0.00" departLane="random" end="259.6309117070809" from="end4_junction" id="flow41b" probability="0.04531" to="junction_end1" type="bike1" />
+    <flow begin="0.00" departLane="random" end="259.6309117070809" from="end4_junction" id="flow42b" probability="0.04233" to="junction_end2" type="bike1" />
+    <flow begin="0.00" departLane="random" end="259.6309117070809" from="end4_junction" id="flow43b" probability="0.19436" to="junction_end3" type="bike1" />
+
+
+
+</routes>

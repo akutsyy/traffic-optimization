@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2022-01-17 23:18:57 by Eclipse SUMO sumo Version 1.11.0
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
+
+    <input>
+        <net-file value="in_use_files/number_4.net.xml"/>
+        <route-files value="in_use_files/number_4.rou.xml"/>
+    </input>
+
+    <output>
+        <summary-output value="in_use_files/sum_number_4.xml"/>
+        <tripinfo-output value="in_use_files/tripinfo_number_4.xml"/>
+    </output>
+
+    <time>
+        <end value="900"/>
+    </time>
+
+    <processing>
+        <time-to-teleport value="-1"/>
+    </processing>
+
+    <report>
+        <no-warnings value="true"/>
+    </report>
+
+    <traci_server>
+        <remote-port value="50095"/>
+    </traci_server>
+
+    <gui_only>
+        <gui-settings-file value="in_use_files/flick.cfg"/>
+        <quit-on-end value="true"/>
+        <start value="true"/>
+    </gui_only>
+
+</configuration>
+-->
+
+<tripinfos xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/tripinfo_file.xsd">
+    <tripinfo id="flow14c.0" depart="0.00" departLane="end1_junction_2" departPos="5.10" departSpeed="0.00" departDelay="0.00" arrival="76.00" arrivalLane="junction_end4_0" arrivalPos="486.40" arrivalSpeed="14.20" duration="76.00" routeLength="976.73" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="7.93" rerouteNo="0" devices="tripinfo_flow14c.0 routing_flow14c.0" vType="car1" speedFactor="1.06" vaporized=""/>
+    <tripinfo id="flow21c.0" depart="4.00" departLane="end2_junction_1" departPos="5.10" departSpeed="0.00" departDelay="0.00" arrival="76.00" arrivalLane="junction_end1_0" arrivalPos="486.40" arrivalSpeed="15.09" duration="72.00" routeLength="976.73" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="7.43" rerouteNo="0" devices="tripinfo_flow21c.0 routing_flow21c.0" vType="car1" speedFactor="1.12" vaporized=""/>
+    <tripinfo id="flow21c.1" depart="10.00" departLane="end2_junction_1" departPos="5.10" departSpeed="0.00" departDelay="0.00" arrival="82.00" arrivalLane="junction_end1_0" arrivalPos="486.40" arrivalSpeed="15.49" duration="72.00" routeLength="976.73" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="10.46" rerouteNo="0" devices="tripinfo_flow21c.1 routing_flow21c.1" vType="car1" speedFactor="1.15" vaporized=""/>
+    <tripinfo id="flow32t.0" depart="2.00" departLane="end3_junction_2" departPos="7.20" departSpeed="0.00" departDelay="0.00" arrival="89.00" arrivalLane="junction_end2_0" arrivalPos="486.40" arrivalSpeed="12.88" duration="87.00" routeLength="974.63" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="10.00" rerouteNo="0" devices="tripinfo_flow32t.0 routing_flow32t.0" vType="truck1" speedFactor="0.93" vaporized=""/>
+    <tripinfo id="flow43c.0" depart="5.00" departLane="end4_junction_1" departPos="5.10" departSpeed="0.00" departDelay="0.00" arrival="90.00" arrivalLane="junction_end3_0" arrivalPos="486.40" arrivalSpeed="12.47" duration="85.00" routeLength="976.73" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="9.24" rerouteNo="0" devices="tripinfo_flow43c.0 routing_flow43c.0" vType="car1" speedFactor="0.94" vaporized=""/>
+    <tripinfo id="flow14t.0" depart="6.00" departLane="end1_junction_2" departPos="7.20" departSpeed="0.00" departDelay="0.00" arrival="90.00" arrivalLane="junction_end4_0" arrivalPos="486.40" arrivalSpeed="12.81" duration="84.00" routeLength="974.63" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="10.51" rerouteNo="0" devices="tripinfo_flow14t.0 routing_flow14t.0" vType="truck1" speedFactor="0.97" vaporized=""/>
+    <tripinfo id="flow32c.0" depart="11.00" departLane="end3_junction_0" departPos="5.10" departSpeed="0.00" departDelay="4.00" arrival="90.00" arrivalLane="junction_end2_1" arrivalPos="486.40" arrivalSpeed="13.62" duration="79.00" routeLength="976.73" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="7.97" rerouteNo="0" devices="tripinfo_flow32c.0 routing_flow32c.0" vType="car1" speedFactor="1.01" vaporized=""/>
+    <tripinfo id="flow32t.1" depart="12.00" departLane="end3_junction_2" departPos="7.20" departSpeed="0.00" departDelay="5.00" arrival="96.00" arrivalLane="junction_end2_0" arrivalPos="486.40" arrivalSpeed="13.15" duration="84.00" routeLength="974.63" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="12.37" rerouteNo="0" devices="tripinfo_flow32t.1 routing_flow32t.1" vType="truck1" speedFactor="0.99" vaporized=""/>
+    <tripinfo id="flow42t.0" depart="3.00" departLane="end4_junction_0" departPos="7.20" departSpeed="0.00" departDelay="2.00" arrival="98.00" arrivalLane="junction_end2_1" arrivalPos="486.40" arrivalSpeed="14.01" duration="95.00" routeLength="992.80" waitingTime="5.00" waitingCount="1" stopTime="0.00" timeLoss="24.80" rerouteNo="0" devices="tripinfo_flow42t.0 routing_flow42t.0" vType="truck1" speedFactor="1.02" vaporized=""/>
+    <tripinfo id="flow32c.1" depart="18.00" departLane="end3_junction_1" departPos="5.10" departSpeed="0.00" departDelay="2.00" arrival="98.00" arrivalLane="junction_end2_0" arrivalPos="486.40" arrivalSpeed="13.98" duration="80.00" routeLength="976.73" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="11.65" rerouteNo="0" devices="tripinfo_flow32c.1 routing_flow32c.1" vType="car1" speedFactor="1.04" vaporized=""/>
+</tripinfos>
