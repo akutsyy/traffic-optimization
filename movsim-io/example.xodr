@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <OpenDRIVE>
-   <header date="2022-01-12 17:53:19.688778" east="0.0" name="myroad" north="0.0" revMajor="1" revMinor="5" south="0.0" west="0.0"/>
+   <header date="2022-01-14 19:49:54.803702" east="0.0" name="myroad" north="0.0" revMajor="1" revMinor="5" south="0.0" west="0.0"/>
    <road id="0" junction="-1" length="100">
       <link>
          <successor elementId="1" elementType="junction"/>
@@ -13,12 +13,6 @@
       <lateralProfile/>
       <lanes>
          <laneSection s="0">
-            <left>
-               <lane id="1" level="false" type="driving">
-                  <link/>
-                  <width a="3" b="0" c="0" d="0" sOffset="0"/>
-               </lane>
-            </left>
             <right>
                <lane id="-1" level="false" type="driving">
                   <link/>
@@ -53,35 +47,75 @@
          </laneSection>
       </lanes>
    </road>
-   <road id="2" junction="-1" length="100">
+   <road id="2" junction="-1" length="200">
       <link>
          <predecessor elementId="1" elementType="junction"/>
       </link>
       <planView>
-         <geometry hdg="0.31499999999999995" length="100" s="0" x="129.68913202218454" y="3.276643646947392">
+         <geometry hdg="0.31499999999999995" length="200" s="0" x="129.68913202218454" y="3.276643646947392">
             <line/>
          </geometry>
       </planView>
       <lateralProfile/>
       <lanes>
          <laneSection s="0">
-            <left>
-               <lane id="1" level="false" type="driving">
-                  <link/>
-                  <width a="3" b="0" c="0" d="0" sOffset="0"/>
-               </lane>
-            </left>
             <right>
                <lane id="-1" level="false" type="driving">
-                  <link/>
+                  <link>
+                     <successor id="-1"/>
+                  </link>
                   <width a="3" b="0" c="0" d="0" sOffset="0"/>
                </lane>
                <lane id="-2" level="false" type="driving">
-                  <link/>
+                  <link>
+                     <successor id="-2"/>
+                  </link>
                   <width a="3" b="0" c="0" d="0" sOffset="0"/>
                </lane>
                <lane id="-3" level="false" type="driving">
-                  <link/>
+                  <link>
+                     <successor id="-3"/>
+                  </link>
+                  <width a="3" b="0" c="0" d="0" sOffset="0"/>
+               </lane>
+            </right>
+         </laneSection>
+         <laneSection s="70">
+            <right>
+               <lane id="-1" level="false" type="driving">
+                  <link>
+                     <predecessor id="-1"/>
+                  </link>
+                  <width a="3" b="0" c="0" d="0" sOffset="0"/>
+               </lane>
+               <lane id="-2" level="false" type="driving">
+                  <link>
+                     <predecessor id="-2"/>
+                     <successor id="-1"/>
+                  </link>
+                  <width a="3" b="0" c="0" d="0" sOffset="0"/>
+               </lane>
+               <lane id="-3" level="false" type="driving">
+                  <link>
+                     <predecessor id="-3"/>
+                     <successor id="-2"/>
+                  </link>
+                  <width a="3" b="-0.1" c="0" d="0" sOffset="0"/>
+               </lane>
+            </right>
+         </laneSection>
+         <laneSection s="100">
+            <right>
+               <lane id="-1" level="false" type="driving">
+                  <link>
+                     <predecessor id="-2"/>
+                  </link>
+                  <width a="3" b="0" c="0" d="0" sOffset="0"/>
+               </lane>
+               <lane id="-2" level="false" type="driving">
+                  <link>
+                     <predecessor id="-3"/>
+                  </link>
                   <width a="3" b="0" c="0" d="0" sOffset="0"/>
                </lane>
             </right>
@@ -101,15 +135,6 @@
       <lateralProfile/>
       <lanes>
          <laneSection s="0">
-            <left>
-               <lane id="1" level="false" type="driving">
-                  <link>
-                     <predecessor id="1"/>
-                     <successor id="1"/>
-                  </link>
-                  <width a="3" b="0" c="0" d="0" sOffset="0"/>
-               </lane>
-            </left>
             <right>
                <lane id="-1" level="false" type="driving">
                   <link>
@@ -158,12 +183,10 @@
       <connection connectingRoad="3" contactPoint="end" id="0" incomingRoad="2">
          <laneLink from="-1" to="-1"/>
          <laneLink from="-2" to="-2"/>
-         <laneLink from="1" to="1"/>
       </connection>
       <connection connectingRoad="3" contactPoint="start" id="1" incomingRoad="0">
          <laneLink from="-1" to="-1"/>
          <laneLink from="-2" to="-2"/>
-         <laneLink from="1" to="1"/>
       </connection>
       <connection connectingRoad="4" contactPoint="end" id="2" incomingRoad="2">
          <laneLink from="-1" to="-3"/>

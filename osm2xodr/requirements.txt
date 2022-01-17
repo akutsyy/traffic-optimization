@@ -1,4 +1,0 @@
-pyproj
-osmread
-numpy
-Pillow
