@@ -7,11 +7,13 @@ import xml.etree.ElementTree as ET
 import os
 import numpy as np
 
+cccc = 0
 
-NO_GUI = False
+NO_GUI = True
 TRAFFIC_TYPES = ['car1', 'truck1', 'bike1']
 pd.set_option('display.max_columns', None)
 METRIC = 'meanSpeedRelative'
+GRIDLOCK_PENALTY = 0.1
 
 N_LIMIT = 3600
 N = 2000
@@ -34,32 +36,37 @@ def call_sim_parallel(dparams):
 
 def call_sim(params, network_type='intersection', early_stop=False):
     ret_code = update_network(params)
+    global cccc
+    cccc+=1
+    print("ROUND ", cccc)
     if not ret_code:
         return 0.0
-    go(early_stop=early_stop)
-    print(params[0])
-    return get_sum_stats()
+    grid_pen = go()
+    grid_pen = grid_pen * GRIDLOCK_PENALTY
+    print(params)
+    return get_sum_stats(grid_pen)
 
 
-def get_sum_stats(metric='meanSpeedRelative'):
+def get_sum_stats(grid_pen,metric='meanSpeedRelative'):
     # metric = one of 'halting-ratio', 'meanTravelTime' or 'meanSpeedRelative'
     df = pd.read_xml("sum.xml")[:-1]
+    df = df.head(int(len(df)*0.9)).tail(int(len(df)*0.8))
     if metric == 'halting-ratio':
         df['halting-ratio'] = df['halting'] / df['running']
-    #df.plot(x="ended",y=metric)
-    #plt.show()
-    metric_out = abs(int(1000*integrate.trapezoid(df['ended'], df[metric])) / df['ended'].values[-1])
-    print("MOUT: ", metric_out, "OR", np.average(df['meanSpeedRelative']))
-    return metric_out
+    metric_out = np.average(df[metric])
+    print(metric_out, " - ", grid_pen, " = ", metric_out-grid_pen)
+
+    return max(0,metric_out-grid_pen)
 
 def set_session():
     global session
     session = True
 
-def go(early_stop = False):
+
+def go():
     if os.path.isfile("sum.xml"):
         os.remove("sum.xml")
-    cmd = [sumoBinary, "-c", "inter1.sumocfg", "--start","--quit-on-end",
+    cmd = [sumoBinary, "-c", "inter1.sumocfg", "--start","--quit-on-end", "--no-warnings",
            "--summary", "sum.xml", "--tripinfo-output", "tripinfo.xml", "--time-to-teleport", "-1"]
     traci.start(cmd)
     iterations = 0
@@ -69,18 +76,19 @@ def go(early_stop = False):
     while traci.simulation.getMinExpectedNumber() > 0:
         traci.simulationStep()
         iterations +=1
-        if iterations % 1000 == 0:
+        if iterations % 300 == 0:
             cur_inb_sp = traci.edge.getLastStepMeanSpeed("end1_junction")
             cur_outb_sp = traci.edge.getLastStepMeanSpeed("junction_end1")
 
-            if (iterations >= 10000 or (cur_inb_sp == last_inb_sp and cur_outb_sp == last_outb_sp)):
+            if (cur_inb_sp == last_inb_sp and cur_outb_sp == last_outb_sp):
                 print("Gridlock! Breaking...")
-                break
+                traci.close()
+                return 1
             else:
                 last_outb_sp = cur_outb_sp
                 last_inb_sp = cur_inb_sp
-
     traci.close()
+    return 0
 
 
 # total is total traffic flow on edge, ratios is ratio of proportions
@@ -145,8 +153,8 @@ def update_network(param_list):
             #print(9+k, prob, param_list[9+k],n.attrib)
 
         #Set tau and sigma for all vTypes
-        for vType in root.findall('vType'):
-            print()
+        #for vType in root.findall('vType'):
+            #print()
             #vType.set('sigma',str(param_list[4]))
             #vType.set('tau',str(param_list[5]))
 
@@ -155,9 +163,10 @@ def update_network(param_list):
     #Update the traffic lights
     with open(os.path.join(os.path.dirname(__file__), './draft.net.xml')) as f:
         root = ET.parse(f)
-        for i, phase in enumerate(root.find('tlLogic')):
+        zs = list(x for x in root.find('tlLogic') if 'y' not in x.get('state'))
+        for i, phase in enumerate(zs):
             #print(phase.attrib, param_list[i], get_props_from_total(1,param_list[0:4],param_list[i]))
-            phase.set('duration', get_props_from_total(1,param_list[0:4],param_list[i]))
+            phase.set('duration', get_props_from_total(60,param_list[0:4],param_list[i]))
         root.write('./draft.net.xml')
 
     return True
