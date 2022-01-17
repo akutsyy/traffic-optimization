@@ -35,6 +35,29 @@ class emu():
                                      ContinuousParameter('trucks', 1, 1),
                                      ContinuousParameter('cars', 1, 1),
                                      ContinuousParameter('bikes', 1, 1),
+                                     ContinuousParameter('NE', 0.1, 0.1),
+                                     ContinuousParameter('NS', 0.1, 0.1),
+                                     ContinuousParameter('NW', 0.1, 0.1),
+                                     ContinuousParameter('EN', 0.1, 0.1),
+                                     ContinuousParameter('ES', 0.1, 0.1),
+                                     ContinuousParameter('EW', 0.1, 0.1),
+                                     ContinuousParameter('SN', 0.1, 0.1),
+                                     ContinuousParameter('SE', 0.1, 0.1),
+                                     ContinuousParameter('SW', 0.1, 0.1),
+                                     ContinuousParameter('WN', 0.1, 0.1),
+                                     ContinuousParameter('WE', 0.1, 0.1),
+                                     ContinuousParameter('WS', 0.1, 0.1),
+                                     ])
+
+        self.space = ParameterSpace([ContinuousParameter('traffic_light_1', 1, 10),
+                                     ContinuousParameter('traffic_light_2', 1, 10),
+                                     ContinuousParameter('traffic_light_3', 1, 10),
+                                     ContinuousParameter('traffic_light_4', 1, 10),
+                                     ContinuousParameter('sigma', 0.5, 0.5),
+                                     ContinuousParameter('tau', 0.5, 0.5),
+                                     ContinuousParameter('trucks', 1, 1),
+                                     ContinuousParameter('cars', 1, 1),
+                                     ContinuousParameter('bikes', 1, 1),
                                      ContinuousParameter('NE', 0.01, 0.5),
                                      ContinuousParameter('NS', 0.01, 0.5),
                                      ContinuousParameter('NW', 0.01, 0.5),
@@ -49,7 +72,7 @@ class emu():
                                      ContinuousParameter('WS', 0.01, 0.5),
                                      ])
         # Kernel
-        kern = GPy.kern.RBF(21, lengthscale=0.08, variance=20)
+        kern = GPy.kern.RBF(21, lengthscale=0.2, variance=0.1)
 
         # GP
         self.X = np.array([[1, 1, 1, 1] + INITIAL_PARTIAL_VARIABLES])
@@ -74,14 +97,14 @@ class emu():
                                                 model = self.model,
                                                 acquisition = us_acquisition,
                                                 update_interval = 1,
-                                                batch_size = 5)
+                                                batch_size = batch_size)
 
         # Run the loop
-        for i in range(iterations//10):
-            expdesign_loop.run_loop(runner.call_sim_parallel, 2)
+        for i in range(iterations//50):
+            expdesign_loop.run_loop(runner.call_sim_parallel, 50//batch_size)
             with open(save_filename, 'wb') as pw:
                 pickle.dump(self.model, pw)
-                print("Dumped model succesfully at iteration " + str((i+1)*10))
+                print("Dumped model succesfully at iteration " + str((i+1)*50))
 
         if save_filename:
             with open(save_filename, 'wb') as pw:
@@ -102,7 +125,9 @@ class emu():
 
         # optimise_x are the parameters to optimise
         def partial_call(optimise_x):
-            return sign * self.call(np.expand_dims(np.append(optimise_x, partial_x), axis=0))[0]
+            output = sign * self.call(np.expand_dims(np.append(optimise_x, partial_x), axis=0))[0]
+            print("output is " +str(output))
+            return output
 
         user_function = UserFunctionWrapper(partial_call)
         x_init = np.array([np.ones(len(to_optimize))])
@@ -117,7 +142,7 @@ class emu():
 
 if __name__ == '__main__':
     picklename = "emulator_test_many_iterations.pkl"
-    explore_iterations = 10000
+    explore_iterations = 100
     optimize_iterations = 50
     from_pickle = False
 
@@ -125,7 +150,7 @@ if __name__ == '__main__':
         e = emu(picklename)
     else:
         e = emu()
-        e.explore(explore_iterations, save_filename=picklename)
+        e.explore(explore_iterations, save_filename=picklename,batch_size=5)
 
     max_values, loop_state = e.optimise(INITIAL_PARTIAL_VARIABLES, iterations=optimize_iterations)
     xs = range(optimize_iterations + 1)

@@ -87,17 +87,18 @@ def go(name):
     while conn.simulation.getMinExpectedNumber() > 0:
         conn.simulationStep()
         iterations += 1
-        if iterations % 300 == 0:
+        if iterations % 500 == 0:
             cur_inb_sp = conn.edge.getLastStepMeanSpeed("end1_junction")
             cur_outb_sp = conn.edge.getLastStepMeanSpeed("junction_end1")
 
             if (cur_inb_sp == last_inb_sp and cur_outb_sp == last_outb_sp):
-                print("Gridlock! Breaking...")
+                print("Traffic Stabilized. Breaking...")
                 conn.close()
-                return 1
+                return 0
             else:
                 last_outb_sp = cur_outb_sp
                 last_inb_sp = cur_inb_sp
+    print("---------------------"+str(iterations))
     conn.close()
     return 0
 
@@ -191,6 +192,7 @@ def update_network(param_list, savename='test'):
 
 # this is the main entry point of this script
 if __name__ == "__main__":
+    update_sumoconfig("test")
     go("test")
     get_sum_stats("test")
     """

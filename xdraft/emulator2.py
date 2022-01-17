@@ -42,7 +42,7 @@ def train_model(max_iterations=250):
     print(X)
     Y = np.array(runner.call_sim_parallel(X))
     print(Y)
-    kern = GPy.kern.RBF(21, lengthscale=0.08, variance=20)
+    kern = GPy.kern.RBF(21, lengthscale=0.08, variance=0.1)
     model_gpy = GPRegression(X,Y, kern, noise_var=1e-10)
     model_gpy.optimize()
     model_emukit = GPyModelWrapper(model_gpy)
@@ -67,7 +67,6 @@ if __name__ == '__main__':
     train = True
     if train:
         train_model()
-
 
     with open('model.pkl','rb') as pw:
         model_emukit = pickle.load(pw)
