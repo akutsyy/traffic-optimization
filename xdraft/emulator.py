@@ -1,3 +1,5 @@
+import pickle
+
 import GPy
 import numpy as np
 from emukit.core.loop import UserFunctionWrapper
@@ -15,9 +17,9 @@ FOURLIGHTS = [ContinuousParameter('traffic_light_1', 1, 100),
               ContinuousParameter('traffic_light_3', 1, 100),
               ContinuousParameter('traffic_light_4', 1, 100)]
 
-
+INITIAL_PARTIAL_VARIABLES = [0.5, 0.5, 1, 1, 1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
 class emu():
-    def __init__(self, iterations):
+    def __init__(self):
 
         # Define parameter space for the simulator variables
         self.space = ParameterSpace([ContinuousParameter('traffic_light_1', 1, 10),
@@ -46,19 +48,21 @@ class emu():
         self.kern = GPy.kern.RBF(21, lengthscale=0.08, variance=20)
 
         # GP
-        self.X = np.array([[1, 1, 1, 1, 0, 0.01, 2, 2, 2, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]])
+        self.X = np.array([[1, 1, 1, 1]+INITIAL_PARTIAL_VARIABLES])
         self.Y = np.array([[call_sim(self.X[0])]])
         self.gpy_model = GPy.models.GPRegression(self.X, self.Y, self.kern, noise_var=1e-10)
         # Emukit Model
         self.model = GPyModelWrapper(self.gpy_model)
 
-    def train(self, iterations):
+    # Save to file if given a name
+    def train(self, iterations, save_filename=None):
         # Acquisition function
         us_acquisition = ModelVariance(self.model)
         # Acquisition optimiser
         optimizer = GradientAcquisitionOptimizer(self.space)
 
-        for _ in range(iterations):
+        for i in range(iterations):
+            print("Iteration "+str(i))
             # Get next point
             global x_new
             x_new, _ = optimizer.optimize(us_acquisition)
@@ -75,20 +79,35 @@ class emu():
             # Add data to model
             self.model.set_data(np.array(self.X), np.array(self.Y))
 
+            if i % 10 and save_filename:
+                with open(save_filename, 'wb') as pw:
+                    pickle.dump(self, pw)
+                    print("Dumped model succesfully at iteration "+str(i))
+
+        if save_filename:
+            with open(save_filename, 'wb') as pw:
+                pickle.dump(self, pw)
+                print("Dumped model succesfully at last iteration")
+
 
     def call(self, x):
         # Returns tuple of mean and variance
         return self.model.predict(x)
 
     # partial_x will be things like number of cars on the road
-    def optimise(self, partial_x, to_optimize=FOURLIGHTS, iterations=10):
+    def optimise(self, partial_x, to_optimize=FOURLIGHTS, iterations=10,maximize=True):
         assert len(partial_x) == 17
+        if maximize:
+            sign = -1
+        else:
+            sign = 1
+
         # optimise_x are the parameters to optimise
         def partial_call(optimise_x):
-            return self.call(np.expand_dims(np.append(optimise_x, partial_x), axis=0))[0]
+            return sign*self.call(np.expand_dims(np.append(optimise_x, partial_x), axis=0))[0]
 
         user_function = UserFunctionWrapper(partial_call)
-        x_init = np.ones(len(to_optimize))
+        x_init = np.array([np.ones(len(to_optimize))])
         y_init = partial_call(x_init)
 
         bo = GPBayesianOptimization(variables_list=to_optimize,
@@ -98,17 +117,53 @@ class emu():
 
         print(bo.loop_state.X)
         print(bo.loop_state.Y)
-        maximum = bo.loop_state.X[np.argmax(bo.loop_state.Y)]
-        return maximum
+        print(bo.loop_state.results)
+        maximum = bo.loop_state.X[-1]
+        return maximum, bo.loop_state
 
+def get_emu_from_pickle(filename):
+    with open(filename,'rb') as pw:
+        emu = pickle.load(pw)
+        print("loaded model")
+        return emu
 
-e = emu(20)
-#x_plt = np.linspace(0,100,1000)[:, None]
-#rest = np.array([[1,1,1,0.5,0.5,1,1,1,0.9,0.9,0.9,0.9,0.9,0.45,0.45,0.45,0.1,0.1,0.1,0.1]]*1000)
-#y_plt, y_var = e.call(np.append(x_plt, rest, axis=1))
-#plt.fill_between(x_plt[:,0], y_plt[:,0]+y_var[:,0], y_plt[:,0]-y_var[:,0], alpha=0.3)
-#plt.plot(x_plt[:,0], y_plt[:,0])
-#plt.xlim((0,100))
-#plt.ylim((-50,50))
-#plt.show()
-print(e.optimise([0.5, 0.5, 1, 1, 1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1], iterations = 100))
+if __name__ == '__main__':
+
+    train_iterations = 200
+    iterations = 30
+
+    e = emu()
+    e.train(train_iterations,save_filename="emulator_test_200_iterations.pkl")
+
+    max_values, loop_state = e.optimise(INITIAL_PARTIAL_VARIABLES, iterations = iterations)
+    xs = range(iterations+1)
+    ys = [-1*y[0] for y in loop_state.Y]
+
+    fig, ax = plt.subplots()
+    ax.plot(xs,ys)
+
+    ax.set(xlabel='Iteration of Bayesian Optimization', ylabel='Mean Speed (% of speed limit)',
+           title='Mean Car Speed After '+str(iterations)+' Iterations of Bayesian Optimization')
+    ax.grid()
+
+    fig.savefig("bo_results.png")
+    plt.show()
+
+    fig, ax = plt.subplots()
+
+    ys = loop_state.X
+    newys = []
+    for y in ys:
+        sum = np.sum(y)
+        newys.append(100*y/sum)
+    ys = np.array(newys).transpose()
+    print(ys)
+
+    for y in ys:
+        ax.plot(xs,y)
+
+    ax.set(xlabel='Iteration of Bayesian Optimization', ylabel='Percent of time spent in each light configuration',
+           title='Traffic Light Configuration After ' + str(iterations) + ' Iterations of Bayesian Optimization')
+    ax.grid()
+    fig.savefig("bo_config.png")
+    plt.show()

@@ -8,7 +8,7 @@ import os
 import numpy as np
 
 
-NO_GUI = False
+NO_GUI = True
 TRAFFIC_TYPES = ['car1', 'truck1', 'bike1']
 pd.set_option('display.max_columns', None)
 METRIC = 'meanSpeedRelative'
