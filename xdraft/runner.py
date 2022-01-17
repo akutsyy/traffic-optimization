@@ -13,8 +13,8 @@ TRAFFIC_TYPES = ['car1', 'truck1', 'bike1']
 pd.set_option('display.max_columns', None)
 METRIC = 'meanSpeedRelative'
 
-N_LIMIT = 600
-N = 1500
+N_LIMIT = 3600
+N = 2000
 
 NO_SIM = True  # skip re-simulating
 
@@ -37,7 +37,8 @@ def call_sim(params, network_type='intersection', early_stop=False):
     if not ret_code:
         return 0.0
     go(early_stop=early_stop)
-    return get_sum_stats(METRIC)
+    print(params[0])
+    return get_sum_stats()
 
 
 def get_sum_stats(metric='meanSpeedRelative'):
@@ -48,6 +49,7 @@ def get_sum_stats(metric='meanSpeedRelative'):
     #df.plot(x="ended",y=metric)
     #plt.show()
     metric_out = abs(int(1000*integrate.trapezoid(df['ended'], df[metric])) / df['ended'].values[-1])
+    print("MOUT: ", metric_out, "OR", np.average(df['meanSpeedRelative']))
     return metric_out
 
 def set_session():
@@ -57,14 +59,27 @@ def set_session():
 def go(early_stop = False):
     if os.path.isfile("sum.xml"):
         os.remove("sum.xml")
-    cmd = [sumoBinary, "-c", "inter1.sumocfg", "--start", "--quit-on-end",
-           "--summary", "sum.xml", "--tripinfo-output", "tripinfo.xml"]
+    cmd = [sumoBinary, "-c", "inter1.sumocfg", "--start","--quit-on-end",
+           "--summary", "sum.xml", "--tripinfo-output", "tripinfo.xml", "--time-to-teleport", "-1"]
     traci.start(cmd)
     iterations = 0
+
+    last_inb_sp = -1
+    last_outb_sp = -1
     while traci.simulation.getMinExpectedNumber() > 0:
         traci.simulationStep()
         iterations +=1
-        if (iterations >= 100) & early_stop: break
+        if iterations % 1000 == 0:
+            cur_inb_sp = traci.edge.getLastStepMeanSpeed("end1_junction")
+            cur_outb_sp = traci.edge.getLastStepMeanSpeed("junction_end1")
+
+            if (iterations >= 10000 or (cur_inb_sp == last_inb_sp and cur_outb_sp == last_outb_sp)):
+                print("Gridlock! Breaking...")
+                break
+            else:
+                last_outb_sp = cur_outb_sp
+                last_inb_sp = cur_inb_sp
+
     traci.close()
 
 
@@ -131,8 +146,9 @@ def update_network(param_list):
 
         #Set tau and sigma for all vTypes
         for vType in root.findall('vType'):
-            vType.set('sigma',str(param_list[4]))
-            vType.set('tau',str(param_list[5]))
+            print()
+            #vType.set('sigma',str(param_list[4]))
+            #vType.set('tau',str(param_list[5]))
 
         root.write('./draft.rou.xml')
 
