@@ -40,7 +40,7 @@ def get_sum_stats(metric='meanSpeedRelative'):
         df['halting-ratio'] = df['halting'] / df['running']
     # df.plot(x="ended",y=metric)
     # plt.show()
-    metric_out = int(int(integrate.trapezoid(df['ended'], df[metric])) / df['ended'].values[-1])
+    metric_out = int(integrate.trapezoid(df['ended'], df[metric])) / df['ended'].values[-1]
     return metric_out
 
 def set_session():
