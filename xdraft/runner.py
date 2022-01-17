@@ -50,10 +50,10 @@ def call_sim(params, name="test", network_type='intersection', early_stop=False)
     ret_code = update_network(params)
     if not ret_code:
         return 0.0
+    update_sumoconfig(name)
     grid_pen = go(name)
     grid_pen = grid_pen * GRIDLOCK_PENALTY
     return get_sum_stats(grid_pen, name)
-
 
 def get_sum_stats(grid_pen, name, metric='meanSpeedRelative'):
     # metric = one of 'halting-ratio', 'meanTravelTime' or 'meanSpeedRelative'
@@ -108,6 +108,12 @@ def go(name):
 def get_props_from_total(total, ratios, selected):
     return str(round(total * selected / sum(ratios), 5))
 
+def update_sumoconfig(name):
+    with open(os.path.join(os.path.dirname(__file__), './inter1.sumocfg'),'r') as f:
+        s = f.read()
+        s = s.replace("draft",str(name))
+        with open(os.path.join(os.path.dirname(__file__), "./"+str(name)+".sumocfg"),'w+') as f2:
+            f2.write(s)
 
 def update_network(param_list, savename='test'):
     # Must have all routes flowing to stop it falling into just allowing the busiest lane to flow only.
