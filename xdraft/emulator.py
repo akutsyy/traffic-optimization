@@ -13,12 +13,13 @@ from emukit.experimental_design.experimental_design_loop import ExperimentalDesi
 import runner
 import matplotlib.pyplot as plt
 
-FOURLIGHTS = [ContinuousParameter('traffic_light_1', 1, 100),
-              ContinuousParameter('traffic_light_2', 1, 100),
-              ContinuousParameter('traffic_light_3', 1, 100),
-              ContinuousParameter('traffic_light_4', 1, 100)]
+FOURLIGHTS = [ContinuousParameter('traffic_light_1', 1, 10),
+              ContinuousParameter('traffic_light_2', 1, 10),
+              ContinuousParameter('traffic_light_3', 1, 10),
+              ContinuousParameter('traffic_light_4', 1, 10)]
 
 INITIAL_PARTIAL_VARIABLES = [0.5, 0.5, 1, 1, 1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+INITIAL_PARTIAL_VARIABLES = [0.5, 0.5, 1, 1, 1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
 
 
 class emu():
@@ -26,33 +27,11 @@ class emu():
 
 
         # Define parameter space for the simulator variables
-        self.space = ParameterSpace([ContinuousParameter('traffic_light_1', 1, 10),
-                                     ContinuousParameter('traffic_light_2', 1, 10),
-                                     ContinuousParameter('traffic_light_3', 1, 10),
-                                     ContinuousParameter('traffic_light_4', 1, 10),
-                                     ContinuousParameter('sigma', 0.5, 0.5),
-                                     ContinuousParameter('tau', 0.5, 0.5),
-                                     ContinuousParameter('trucks', 1, 1),
-                                     ContinuousParameter('cars', 1, 1),
-                                     ContinuousParameter('bikes', 1, 1),
-                                     ContinuousParameter('NE', 0.1, 0.1),
-                                     ContinuousParameter('NS', 0.1, 0.1),
-                                     ContinuousParameter('NW', 0.1, 0.1),
-                                     ContinuousParameter('EN', 0.1, 0.1),
-                                     ContinuousParameter('ES', 0.1, 0.1),
-                                     ContinuousParameter('EW', 0.1, 0.1),
-                                     ContinuousParameter('SN', 0.1, 0.1),
-                                     ContinuousParameter('SE', 0.1, 0.1),
-                                     ContinuousParameter('SW', 0.1, 0.1),
-                                     ContinuousParameter('WN', 0.1, 0.1),
-                                     ContinuousParameter('WE', 0.1, 0.1),
-                                     ContinuousParameter('WS', 0.1, 0.1),
-                                     ])
 
-        self.space = ParameterSpace([ContinuousParameter('traffic_light_1', 1, 10),
-                                     ContinuousParameter('traffic_light_2', 1, 10),
-                                     ContinuousParameter('traffic_light_3', 1, 10),
-                                     ContinuousParameter('traffic_light_4', 1, 10),
+        self.space = ParameterSpace([ContinuousParameter('traffic_light_1', .1, .5),
+                                     ContinuousParameter('traffic_light_2', .1, .5),
+                                     ContinuousParameter('traffic_light_3', .1, .5),
+                                     ContinuousParameter('traffic_light_4', .1, .5),
                                      ContinuousParameter('sigma', 0.5, 0.5),
                                      ContinuousParameter('tau', 0.5, 0.5),
                                      ContinuousParameter('trucks', 1, 1),
@@ -71,11 +50,34 @@ class emu():
                                      ContinuousParameter('WE', 0.01, 0.5),
                                      ContinuousParameter('WS', 0.01, 0.5),
                                      ])
+
+        self.space = ParameterSpace([ContinuousParameter('traffic_light_1', .1, .5),
+                                     ContinuousParameter('traffic_light_2', .1, .5),
+                                     ContinuousParameter('traffic_light_3', .1, .5),
+                                     ContinuousParameter('traffic_light_4', .1, .5),
+                                     ContinuousParameter('sigma', 0.5, 0.5),
+                                     ContinuousParameter('tau', 0.5, 0.5),
+                                     ContinuousParameter('trucks', 1, 1),
+                                     ContinuousParameter('cars', 1, 1),
+                                     ContinuousParameter('bikes', 1, 1),
+                                     ContinuousParameter('NE', 0.5, 0.5),
+                                     ContinuousParameter('NS', 0.5, 0.5),
+                                     ContinuousParameter('NW', 0.5, 0.5),
+                                     ContinuousParameter('EN', 0.5, 0.5),
+                                     ContinuousParameter('ES', 0.5, 0.5),
+                                     ContinuousParameter('EW', 0.5, 0.5),
+                                     ContinuousParameter('SN', 0.5, 0.5),
+                                     ContinuousParameter('SE', 0.5, 0.5),
+                                     ContinuousParameter('SW', 0.5, 0.5),
+                                     ContinuousParameter('WN', 0.5, 0.5),
+                                     ContinuousParameter('WE', 0.5, 0.5),
+                                     ContinuousParameter('WS', 0.5, 0.5),
+                                     ])
         # Kernel
-        kern = GPy.kern.RBF(21, lengthscale=0.2, variance=0.1)
+        kern = GPy.kern.RBF(21, lengthscale=0.1, variance=0.05)
 
         # GP
-        self.X = np.array([[1, 1, 1, 1] + INITIAL_PARTIAL_VARIABLES])
+        self.X = np.array([[.1, .1, .1, .1] + INITIAL_PARTIAL_VARIABLES])
         self.Y = np.array(runner.call_sim_parallel(self.X))
         gpy_model = GPy.models.GPRegression(self.X, self.Y, kern, noise_var=1e-10)
         # Emukit Model
