@@ -116,10 +116,10 @@ class emu():
         return maximum, bo.loop_state
 
 if __name__ == '__main__':
-    picklename = "emulator_test_many_iterations2.pkl"
+    picklename = "emulator_test_many_iterations.pkl"
     explore_iterations = 10000
     optimize_iterations = 50
-    from_pickle = False
+    from_pickle = True
 
     if from_pickle:
         e = emu(picklename)
