@@ -56,8 +56,7 @@ def train_model(max_iterations=250):
 
 
     # Run the loop
-    stopping_condition = FixedIterationsStoppingCondition(i_max = 100)
-    expdesign_loop.run_loop(f, stopping_condition)
+    expdesign_loop.run_loop(f, 100)
 
     with open('model.pkl','wb') as pw:
         pickle.dump(model_emukit,pw)

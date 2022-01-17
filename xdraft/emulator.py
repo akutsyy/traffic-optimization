@@ -9,6 +9,7 @@ from emukit.core.optimization import GradientAcquisitionOptimizer
 from emukit.examples.gp_bayesian_optimization.single_objective_bayesian_optimization import GPBayesianOptimization
 from emukit.bayesian_optimization.acquisitions import ExpectedImprovement
 from emukit.core import ParameterSpace, ContinuousParameter, DiscreteParameter
+from emukit.experimental_design.experimental_design_loop import ExperimentalDesignLoop
 import runner
 import matplotlib.pyplot as plt
 
@@ -69,27 +70,18 @@ class emu():
         # Acquisition optimiser
         optimizer = GradientAcquisitionOptimizer(self.space)
 
-        for i in range(iterations):
-            # Get next point
-            global x_new
-            x_new, _ = optimizer.optimize(us_acquisition)
+        expdesign_loop = ExperimentalDesignLoop(space = self.space,
+                                                model = self.model,
+                                                acquisition = us_acquisition,
+                                                update_interval = 1,
+                                                batch_size = 5)
 
-            # Run simulator on new
-            y_new = np.array([runner.call_sim(list(x_new[0]))])
-
-            self.X = np.append(self.X, x_new, axis=0)
-            self.Y = np.append(self.Y, np.expand_dims(y_new, 0), axis=0)
-
-            print(f"X: {x_new}")
-            print(f"Y: {y_new}")
-
-            # Add data to model
-            self.model.set_data(np.array(self.X), np.array(self.Y))
-
-            if i % 10 == 9 and save_filename:
-                with open(save_filename, 'wb') as pw:
-                    pickle.dump(self.model, pw)
-                    print("Dumped model succesfully at iteration " + str(i))
+        # Run the loop
+        for i in range(iterations//10):
+            expdesign_loop.run_loop(runner.call_sim_parallel, 2)
+            with open(save_filename, 'wb') as pw:
+                pickle.dump(self.model, pw)
+                print("Dumped model succesfully at iteration " + str((i+1)*10))
 
         if save_filename:
             with open(save_filename, 'wb') as pw:
@@ -120,9 +112,6 @@ class emu():
                                     X=x_init, Y=y_init)
         bo.run_optimization(user_function, iterations)
 
-        print(bo.loop_state.X)
-        print(bo.loop_state.Y)
-        print(bo.loop_state.results)
         maximum = bo.loop_state.X[-1]
         return maximum, bo.loop_state
 
@@ -160,7 +149,6 @@ if __name__ == '__main__':
         sum = np.sum(y)
         newys.append(100 * y / sum)
     ys = np.array(newys).transpose()
-    print(ys)
 
     for y in ys:
         ax.plot(xs, y)
