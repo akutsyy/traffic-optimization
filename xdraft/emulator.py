@@ -23,7 +23,6 @@ FOURLIGHTS = [ContinuousParameter('traffic_light_1', .1, .5),
 
 INITIAL_PARTIAL_VARIABLES = [0.5, 1, 1, 1, 1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
 
-
 class emu():
     def __init__(self, from_pickle=None):
 
@@ -49,8 +48,7 @@ class emu():
                                                   ])
 
         # Kernel
-        kern = GPy.kern.RBF(21, lengthscale=0.25, variance=0.001)
-
+        kern = GPy.kern.RBF(21, lengthscale=0.2, variance=0.1)
         # GP
         self.X = np.array([[.1, .1, .1, .1] + INITIAL_PARTIAL_VARIABLES])
         self.Y = np.array(runner.call_sim_parallel(self.X))
@@ -115,7 +113,7 @@ class emu():
         y_init = partial_call(x_init)
 
         bo = GPBayesianOptimization(variables_list=to_optimize,
-                                    X=x_init, Y=y_init,batch_size=1)
+                                    X=x_init, Y=y_init,batch_size=1,noiseless=True)
         bo.run_optimization(user_function, iterations)
 
         best_per_it = np.maximum.accumulate(-1*bo.loop_state.Y)
@@ -125,33 +123,43 @@ class emu():
 
 
 if __name__ == '__main__':
-    picklename = "emulator_test_many_iterations.pkl"
-    explore_iterations = 400
-    optimize_iterations = 50
+    picklename = "emulator.pkl"
+    explore_iterations = 200
+    optimize_iterations = 100
     from_pickle = True
 
     if from_pickle:
         e = emu(picklename)
     else:
         e = emu()
-        e.explore(explore_iterations, save_filename=picklename, batch_size=5)
+        e.explore(explore_iterations, save_filename=picklename, batch_size=10)
 
-    #num_tests = 50
-    #xs = np.linspace(.1,.5,num_tests)
-    #ys = []
-    #for x in xs:
-    #    ys.append(e.call_split([0.2,0.2,x,0.2],[0.5, 0.5, 1, 1, 1, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2])[0])
 
-    #fig, ax = plt.subplots()
-    #ax.plot(xs, ys)
-    #plt.show()
+    parameters = np.append([0.5, 1, 1, 1, 1],np.random.rand(12,)*.49+.01)
+    point = np.random.rand(4,)*.4+.1
+    print(parameters)
 
-    best_result,best_config,best_per_it, loop_x,loop_y = e.optimise(INITIAL_PARTIAL_VARIABLES, iterations=optimize_iterations)
+
+
+    data = np.ones((50,50))
+    for i in range(50):
+        for j in range(50):
+                data[i][j] = e.call_split([i*0.4/50+0.1,j*0.4/50+0.1,point[2],point[3]],parameters)[0][0]
+    fig, ax = plt.subplots()
+    plt.xticks(np.linspace(0,50,5),np.linspace(0.1,0.5,5))
+    plt.yticks(np.linspace(0,50,5),np.linspace(0.1,0.5,5))
+    ax.set(xlabel='Value of light 1\'s parameter', ylabel='Value of light 2\'s parameter',
+           title='Slice of Gaussian Process, \nvarying light 1 and light 2 parameters')
+    ax.pcolormesh(data)
+    fig.savefig("gaussian_slice.png")
+    plt.show()
+
+
+
+    best_result,best_config,best_per_it, loop_x,loop_y = e.optimise(parameters, iterations=optimize_iterations)
 
     xs = range(optimize_iterations+1)
     ys = 100*best_per_it
-    print(best_config)
-    print(runner.call_sim(params=np.append(best_config,INITIAL_PARTIAL_VARIABLES),name="test"))
 
     fig, ax = plt.subplots()
     ax.plot(xs, ys)

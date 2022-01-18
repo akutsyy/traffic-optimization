@@ -48,6 +48,7 @@ def call_sim_zipped(zipped):
 
 
 def call_sim(params, name="test", network_type='intersection', early_stop=False):
+    #print(str(params[0])+"    "+str(params[1]))
     ret_code = update_network(params,name)
     if not ret_code:
         return 0.0
@@ -83,12 +84,12 @@ def go(name):
     conn = traci.getConnection(name)
     iterations = 0
 
-    last_inb_sp = -1
-    last_outb_sp = -1
-    while conn.simulation.getMinExpectedNumber() > 0:
+    #last_inb_sp = -1
+    #last_outb_sp = -1
+    while conn.simulation.getMinExpectedNumber() > 0 and iterations<10000:
         conn.simulationStep()
         iterations += 1
-        if iterations % 500 == 0:
+        """if iterations % 500 == 0:
             cur_inb_sp = conn.edge.getLastStepMeanSpeed("end1_junction")
             cur_outb_sp = conn.edge.getLastStepMeanSpeed("junction_end1")
 
@@ -99,7 +100,7 @@ def go(name):
             else:
                 last_outb_sp = cur_outb_sp
                 last_inb_sp = cur_inb_sp
-    print("---------------------"+str(iterations))
+    print("---------------------"+str(iterations))"""
     conn.close()
     return 0
 
