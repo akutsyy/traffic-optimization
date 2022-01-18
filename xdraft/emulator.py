@@ -2,6 +2,7 @@ import pickle
 
 import GPy
 import numpy as np
+from emukit.core.initial_designs import RandomDesign
 from emukit.core.loop import UserFunctionWrapper
 from emukit.model_wrappers.gpy_model_wrappers import GPyModelWrapper
 from emukit.experimental_design.acquisitions import ModelVariance
@@ -95,56 +96,36 @@ class emu():
         return self.model.predict(x)
 
     def call_split(self, x, rest):
-        return self.call(np.expand_dims(np.append(x, rest), axis=0))[0]
+        return self.call(np.expand_dims(np.append(x, rest), axis=0))
 
     # partial_x will be things like number of cars on the road
-    def optimise(self, partial_x, to_optimize=FOURLIGHTS, iterations=50, maximize=True):
+    def optimise(self, partial_x, to_optimize=FOURLIGHTS, iterations=50):
         assert len(partial_x) == 17
-        if maximize:
-            sign = -1
-        else:
-            sign = 1
+
 
         # optimise_x are the parameters to optimise
         def partial_call(optimise_x):
-            print("input is " + str(optimise_x))
-            output = sign * self.call(np.expand_dims(np.append(optimise_x, partial_x), axis=0))[0]
-            print("output is " + str(output))
+            output = -self.call(np.expand_dims(np.append(optimise_x, partial_x), axis=0))[0]
             return output
 
         user_function = UserFunctionWrapper(partial_call)
-        x_init = np.array([np.ones(len(to_optimize))])
+        x_init = np.array([np.ones(len(to_optimize))])*0.1
         y_init = partial_call(x_init)
 
         bo = GPBayesianOptimization(variables_list=to_optimize,
-                                    X=x_init, Y=y_init)
+                                    X=x_init, Y=y_init,batch_size=1)
         bo.run_optimization(user_function, iterations)
 
-        maximum = bo.loop_state.X[-1]
-        return maximum, bo.loop_state
-
-        # reducedspace = ParameterSpace(to_optimize)
-        # user_function = UserFunctionWrapper(partial_call)
-        # optimizer = GradientAcquisitionOptimizer(reducedspace)
-
-        # acquisition = ExpectedImprovement(model=self.model)
-        # loop = BayesianOptimizationLoop(space=reducedspace,
-        #                                model=self.model,
-        #                                acquisition=acquisition,
-        #                                acquisition_optimizer=optimizer,
-        #                                batch_size=1)
-
-        # loop.run_loop(user_function, iterations)
-        # maximum = loop.loop_state.X[-1]
-        bo.run_loop(user_function, iterations)
-        maximum = bo.loop_state.X[-1]
-        return maximum, bo.loop_state
+        best_per_it = np.maximum.accumulate(bo.loop_state.Y)
+        best_result = np.max(bo.loop_state.Y)
+        best_config = bo.loop_state.X[np.where(bo.loop_state.Y == best_result)]
+        return best_result,best_config,best_per_it,bo.loop_state
 
 
 if __name__ == '__main__':
     picklename = "emulator_test_many_iterations.pkl"
     explore_iterations = 400
-    optimize_iterations = 200
+    optimize_iterations = 50
     from_pickle = True
 
     if from_pickle:
@@ -163,15 +144,16 @@ if __name__ == '__main__':
     #ax.plot(xs, ys)
     #plt.show()
 
-    max_values, loop_state = e.optimise(INITIAL_PARTIAL_VARIABLES, iterations=optimize_iterations)
+    best_result,best_config,best_per_it, loop_state = e.optimise(INITIAL_PARTIAL_VARIABLES, iterations=optimize_iterations)
+
     xs = range(optimize_iterations + 1)
-    ys = [-1 * y[0] for y in loop_state.Y]
+    ys = -100*best_per_it
 
     fig, ax = plt.subplots()
     ax.plot(xs, ys)
 
     ax.set(xlabel='Iteration of Bayesian Optimization', ylabel='Mean Speed (% of speed limit)',
-           title='Mean Car Speed After ' + str(optimize_iterations) + ' Iterations of Bayesian Optimization')
+           title='Highest Discovered Mean Speed (% of speed limit) After ' + str(optimize_iterations) + ' Iterations of Bayesian Optimization')
     ax.grid()
 
     fig.savefig("bo_results.png")
@@ -190,8 +172,7 @@ if __name__ == '__main__':
         ax.plot(xs, y)
 
     ax.set(xlabel='Iteration of Bayesian Optimization', ylabel='Percent of time spent in each light configuration',
-           title='Traffic Light Configuration After ' + str(
-               optimize_iterations) + ' Iterations of Bayesian Optimization')
+           title='Exploration during Bayesian Optimization')
     ax.grid()
     fig.savefig("bo_config.png")
     plt.show()
