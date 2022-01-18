@@ -109,21 +109,23 @@ class emu():
             return output
 
         user_function = UserFunctionWrapper(partial_call)
-        x_init = np.array([np.ones(len(to_optimize))])*0.1
+
+        design = RandomDesign(ParameterSpace(to_optimize))
+        x_init = design.get_samples(1)
         y_init = partial_call(x_init)
 
         bo = GPBayesianOptimization(variables_list=to_optimize,
                                     X=x_init, Y=y_init,batch_size=1)
         bo.run_optimization(user_function, iterations)
 
-        best_per_it = np.minimum.accumulate(bo.loop_state.Y)
-        best_result = np.min(bo.loop_state.Y)
-        best_config = bo.loop_state.X[np.where(bo.loop_state.Y == best_result)]
-        return best_result,best_config,best_per_it,bo.loop_state
+        best_per_it = np.maximum.accumulate(-1*bo.loop_state.Y)
+        best_result = np.max(-1*bo.loop_state.Y)
+        best_config = bo.loop_state.X[np.argmax(-1*bo.loop_state.Y)]
+        return best_result,best_config,best_per_it,bo.loop_state.X,bo.loop_state.Y*-1
 
 
 if __name__ == '__main__':
-    picklename = "emulator_next.pkl"
+    picklename = "emulator_test_many_iterations.pkl"
     explore_iterations = 400
     optimize_iterations = 50
     from_pickle = True
@@ -144,10 +146,12 @@ if __name__ == '__main__':
     #ax.plot(xs, ys)
     #plt.show()
 
-    best_result,best_config,best_per_it, loop_state = e.optimise(INITIAL_PARTIAL_VARIABLES, iterations=optimize_iterations)
+    best_result,best_config,best_per_it, loop_x,loop_y = e.optimise(INITIAL_PARTIAL_VARIABLES, iterations=optimize_iterations)
 
-    xs = range(optimize_iterations + 1)
-    ys = -100*best_per_it
+    xs = range(optimize_iterations+1)
+    ys = 100*best_per_it
+    print(best_config)
+    print(runner.call_sim(params=np.append(best_config,INITIAL_PARTIAL_VARIABLES),name="test"))
 
     fig, ax = plt.subplots()
     ax.plot(xs, ys)
@@ -161,7 +165,7 @@ if __name__ == '__main__':
 
     fig, ax = plt.subplots()
 
-    ys = loop_state.X
+    ys = loop_x
     newys = []
     for y in ys:
         sum = np.sum(y)
