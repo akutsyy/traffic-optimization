@@ -116,14 +116,14 @@ class emu():
                                     X=x_init, Y=y_init,batch_size=1)
         bo.run_optimization(user_function, iterations)
 
-        best_per_it = np.maximum.accumulate(bo.loop_state.Y)
+        best_per_it = np.minimum.accumulate(bo.loop_state.Y)
         best_result = np.max(bo.loop_state.Y)
         best_config = bo.loop_state.X[np.where(bo.loop_state.Y == best_result)]
         return best_result,best_config,best_per_it,bo.loop_state
 
 
 if __name__ == '__main__':
-    picklename = "emulator_test_many_iterations.pkl"
+    picklename = "emulator_next.pkl"
     explore_iterations = 400
     optimize_iterations = 50
     from_pickle = True
@@ -152,8 +152,8 @@ if __name__ == '__main__':
     fig, ax = plt.subplots()
     ax.plot(xs, ys)
 
-    ax.set(xlabel='Iteration of Bayesian Optimization', ylabel='Mean Speed (% of speed limit)',
-           title='Highest Discovered Mean Speed (% of speed limit) After ' + str(optimize_iterations) + ' Iterations of Bayesian Optimization')
+    ax.set(xlabel='Iteration of Bayesian Optimization', ylabel='Highest Discovered Mean Speed (% of speed limit)',
+           title='Discovery of Best Configuration with Bayesian Optimization')
     ax.grid()
 
     fig.savefig("bo_results.png")
@@ -172,7 +172,7 @@ if __name__ == '__main__':
         ax.plot(xs, y)
 
     ax.set(xlabel='Iteration of Bayesian Optimization', ylabel='Percent of time spent in each light configuration',
-           title='Exploration during Bayesian Optimization')
+           title='Exploration of Parameter Space during Bayesian Optimization')
     ax.grid()
     fig.savefig("bo_config.png")
     plt.show()
