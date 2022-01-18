@@ -158,6 +158,7 @@ if __name__ == '__main__':
 
     best_result,best_config,best_per_it, loop_x,loop_y = e.optimise(parameters, iterations=optimize_iterations)
 
+    print(best_config)
     xs = range(optimize_iterations+1)
     ys = 100*best_per_it
 
