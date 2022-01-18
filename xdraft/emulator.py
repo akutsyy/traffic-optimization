@@ -10,76 +10,52 @@ from emukit.examples.gp_bayesian_optimization.single_objective_bayesian_optimiza
 from emukit.bayesian_optimization.acquisitions import ExpectedImprovement
 from emukit.core import ParameterSpace, ContinuousParameter, DiscreteParameter
 from emukit.experimental_design.experimental_design_loop import ExperimentalDesignLoop
+from emukit.bayesian_optimization.loops import BayesianOptimizationLoop
+
 import runner
 import matplotlib.pyplot as plt
 
-FOURLIGHTS = [ContinuousParameter('traffic_light_1', 1, 10),
-              ContinuousParameter('traffic_light_2', 1, 10),
-              ContinuousParameter('traffic_light_3', 1, 10),
-              ContinuousParameter('traffic_light_4', 1, 10)]
+FOURLIGHTS = [ContinuousParameter('traffic_light_1', .1, .5),
+              ContinuousParameter('traffic_light_2', .1, .5),
+              ContinuousParameter('traffic_light_3', .1, .5),
+              ContinuousParameter('traffic_light_4', .1, .5)]
 
 INITIAL_PARTIAL_VARIABLES = [0.5, 0.5, 1, 1, 1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
-INITIAL_PARTIAL_VARIABLES = [0.5, 0.5, 1, 1, 1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
 
 
 class emu():
     def __init__(self, from_pickle=None):
 
-
         # Define parameter space for the simulator variables
 
-        self.space = ParameterSpace([ContinuousParameter('traffic_light_1', .1, .5),
-                                     ContinuousParameter('traffic_light_2', .1, .5),
-                                     ContinuousParameter('traffic_light_3', .1, .5),
-                                     ContinuousParameter('traffic_light_4', .1, .5),
-                                     ContinuousParameter('sigma', 0.5, 0.5),
-                                     ContinuousParameter('tau', 0.5, 0.5),
-                                     ContinuousParameter('trucks', 1, 1),
-                                     ContinuousParameter('cars', 1, 1),
-                                     ContinuousParameter('bikes', 1, 1),
-                                     ContinuousParameter('NE', 0.01, 0.5),
-                                     ContinuousParameter('NS', 0.01, 0.5),
-                                     ContinuousParameter('NW', 0.01, 0.5),
-                                     ContinuousParameter('EN', 0.01, 0.5),
-                                     ContinuousParameter('ES', 0.01, 0.5),
-                                     ContinuousParameter('EW', 0.01, 0.5),
-                                     ContinuousParameter('SN', 0.01, 0.5),
-                                     ContinuousParameter('SE', 0.01, 0.5),
-                                     ContinuousParameter('SW', 0.01, 0.5),
-                                     ContinuousParameter('WN', 0.01, 0.5),
-                                     ContinuousParameter('WE', 0.01, 0.5),
-                                     ContinuousParameter('WS', 0.01, 0.5),
-                                     ])
+        self.space = ParameterSpace(FOURLIGHTS + [ContinuousParameter('sigma', 0.5, 0.5),
+                                                  ContinuousParameter('tau', 0.5, 0.5),
+                                                  ContinuousParameter('trucks', 1, 1),
+                                                  ContinuousParameter('cars', 1, 1),
+                                                  ContinuousParameter('bikes', 1, 1),
+                                                  ContinuousParameter('NE', 0.01, 0.5),
+                                                  ContinuousParameter('NS', 0.01, 0.5),
+                                                  ContinuousParameter('NW', 0.01, 0.5),
+                                                  ContinuousParameter('EN', 0.01, 0.5),
+                                                  ContinuousParameter('ES', 0.01, 0.5),
+                                                  ContinuousParameter('EW', 0.01, 0.5),
+                                                  ContinuousParameter('SN', 0.01, 0.5),
+                                                  ContinuousParameter('SE', 0.01, 0.5),
+                                                  ContinuousParameter('SW', 0.01, 0.5),
+                                                  ContinuousParameter('WN', 0.01, 0.5),
+                                                  ContinuousParameter('WE', 0.01, 0.5),
+                                                  ContinuousParameter('WS', 0.01, 0.5),
+                                                  ])
 
-        self.space = ParameterSpace([ContinuousParameter('traffic_light_1', .1, .5),
-                                     ContinuousParameter('traffic_light_2', .1, .5),
-                                     ContinuousParameter('traffic_light_3', .1, .5),
-                                     ContinuousParameter('traffic_light_4', .1, .5),
-                                     ContinuousParameter('sigma', 0.5, 0.5),
-                                     ContinuousParameter('tau', 0.5, 0.5),
-                                     ContinuousParameter('trucks', 1, 1),
-                                     ContinuousParameter('cars', 1, 1),
-                                     ContinuousParameter('bikes', 1, 1),
-                                     ContinuousParameter('NE', 0.5, 0.5),
-                                     ContinuousParameter('NS', 0.5, 0.5),
-                                     ContinuousParameter('NW', 0.5, 0.5),
-                                     ContinuousParameter('EN', 0.5, 0.5),
-                                     ContinuousParameter('ES', 0.5, 0.5),
-                                     ContinuousParameter('EW', 0.5, 0.5),
-                                     ContinuousParameter('SN', 0.5, 0.5),
-                                     ContinuousParameter('SE', 0.5, 0.5),
-                                     ContinuousParameter('SW', 0.5, 0.5),
-                                     ContinuousParameter('WN', 0.5, 0.5),
-                                     ContinuousParameter('WE', 0.5, 0.5),
-                                     ContinuousParameter('WS', 0.5, 0.5),
-                                     ])
         # Kernel
-        kern = GPy.kern.RBF(21, lengthscale=0.1, variance=0.05)
+        kern = GPy.kern.RBF(21, lengthscale=0.25, variance=0.001)
 
         # GP
         self.X = np.array([[.1, .1, .1, .1] + INITIAL_PARTIAL_VARIABLES])
         self.Y = np.array(runner.call_sim_parallel(self.X))
         gpy_model = GPy.models.GPRegression(self.X, self.Y, kern, noise_var=1e-10)
+        # TODO: ?????????????
+        gpy_model.optimize()
         # Emukit Model
         if from_pickle:
             with open(from_pickle, 'rb') as f:
@@ -89,24 +65,25 @@ class emu():
             self.model = GPyModelWrapper(gpy_model)
 
     # Save to file if given a name
-    def explore(self, iterations,batch_size, save_filename=None):
+    def explore(self, iterations, batch_size, save_filename=None):
         # Acquisition function
         us_acquisition = ModelVariance(self.model)
         # Acquisition optimiser
         optimizer = GradientAcquisitionOptimizer(self.space)
 
-        expdesign_loop = ExperimentalDesignLoop(space = self.space,
-                                                model = self.model,
-                                                acquisition = us_acquisition,
-                                                update_interval = 1,
-                                                batch_size = batch_size)
+        expdesign_loop = ExperimentalDesignLoop(space=self.space,
+                                                model=self.model,
+                                                acquisition=us_acquisition,
+                                                update_interval=1,
+                                                acquisition_optimizer=optimizer,
+                                                batch_size=batch_size)
 
         # Run the loop
-        for i in range(iterations//50):
-            expdesign_loop.run_loop(runner.call_sim_parallel, 50//batch_size)
+        for i in range(iterations // 50):
+            expdesign_loop.run_loop(runner.call_sim_parallel, 50 // batch_size)
             with open(save_filename, 'wb') as pw:
                 pickle.dump(self.model, pw)
-                print("Dumped model succesfully at iteration " + str((i+1)*50))
+                print("Dumped model succesfully at iteration " + str((i + 1) * 50))
 
         if save_filename:
             with open(save_filename, 'wb') as pw:
@@ -116,6 +93,9 @@ class emu():
     def call(self, x):
         # Returns tuple of mean and variance
         return self.model.predict(x)
+
+    def call_split(self, x, rest):
+        return self.call(np.expand_dims(np.append(x, rest), axis=0))[0]
 
     # partial_x will be things like number of cars on the road
     def optimise(self, partial_x, to_optimize=FOURLIGHTS, iterations=50, maximize=True):
@@ -127,8 +107,9 @@ class emu():
 
         # optimise_x are the parameters to optimise
         def partial_call(optimise_x):
+            print("input is " + str(optimise_x))
             output = sign * self.call(np.expand_dims(np.append(optimise_x, partial_x), axis=0))[0]
-            print("output is " +str(output))
+            print("output is " + str(output))
             return output
 
         user_function = UserFunctionWrapper(partial_call)
@@ -142,17 +123,45 @@ class emu():
         maximum = bo.loop_state.X[-1]
         return maximum, bo.loop_state
 
+        # reducedspace = ParameterSpace(to_optimize)
+        # user_function = UserFunctionWrapper(partial_call)
+        # optimizer = GradientAcquisitionOptimizer(reducedspace)
+
+        # acquisition = ExpectedImprovement(model=self.model)
+        # loop = BayesianOptimizationLoop(space=reducedspace,
+        #                                model=self.model,
+        #                                acquisition=acquisition,
+        #                                acquisition_optimizer=optimizer,
+        #                                batch_size=1)
+
+        # loop.run_loop(user_function, iterations)
+        # maximum = loop.loop_state.X[-1]
+        bo.run_loop(user_function, iterations)
+        maximum = bo.loop_state.X[-1]
+        return maximum, bo.loop_state
+
+
 if __name__ == '__main__':
     picklename = "emulator_test_many_iterations.pkl"
-    explore_iterations = 100
-    optimize_iterations = 50
-    from_pickle = False
+    explore_iterations = 400
+    optimize_iterations = 200
+    from_pickle = True
 
     if from_pickle:
         e = emu(picklename)
     else:
         e = emu()
-        e.explore(explore_iterations, save_filename=picklename,batch_size=5)
+        e.explore(explore_iterations, save_filename=picklename, batch_size=5)
+
+    #num_tests = 50
+    #xs = np.linspace(.1,.5,num_tests)
+    #ys = []
+    #for x in xs:
+    #    ys.append(e.call_split([0.2,0.2,x,0.2],[0.5, 0.5, 1, 1, 1, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2])[0])
+
+    #fig, ax = plt.subplots()
+    #ax.plot(xs, ys)
+    #plt.show()
 
     max_values, loop_state = e.optimise(INITIAL_PARTIAL_VARIABLES, iterations=optimize_iterations)
     xs = range(optimize_iterations + 1)

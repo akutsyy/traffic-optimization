@@ -39,6 +39,7 @@ def call_sim_parallel(dparams):
     pool = mp.Pool(len(dparams))
     calls = [(x, "number_" + str(i)) for i, x in enumerate(dparams)]
     out = pool.map(call_sim_zipped,calls)
+    pool.close()
     return np.array([[x] for x in out]) # Package into 2D array
 
 
