@@ -21,7 +21,7 @@ FOURLIGHTS = [ContinuousParameter('traffic_light_1', .1, .5),
               ContinuousParameter('traffic_light_3', .1, .5),
               ContinuousParameter('traffic_light_4', .1, .5)]
 
-INITIAL_PARTIAL_VARIABLES = [0.5, 0.5, 1, 1, 1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+INITIAL_PARTIAL_VARIABLES = [0.5, 1, 1, 1, 1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
 
 
 class emu():
@@ -30,7 +30,7 @@ class emu():
         # Define parameter space for the simulator variables
 
         self.space = ParameterSpace(FOURLIGHTS + [ContinuousParameter('sigma', 0.5, 0.5),
-                                                  ContinuousParameter('tau', 0.5, 0.5),
+                                                  ContinuousParameter('tau', 1, 1),
                                                   ContinuousParameter('trucks', 1, 1),
                                                   ContinuousParameter('cars', 1, 1),
                                                   ContinuousParameter('bikes', 1, 1),
