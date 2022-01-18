@@ -1,7 +1,9 @@
 from GPy.models import GPRegression
+from emukit.bayesian_optimization.acquisitions import ExpectedImprovement
 from emukit.core.initial_designs import RandomDesign
 from emukit.core.loop import FixedIterationsStoppingCondition
 from emukit.core.optimization import GradientAcquisitionOptimizer
+from emukit.examples.gp_bayesian_optimization.single_objective_bayesian_optimization import GPBayesianOptimization
 from emukit.experimental_design.acquisitions import ModelVariance
 from emukit.experimental_design.experimental_design_loop import ExperimentalDesignLoop
 from emukit.core import ParameterSpace, ContinuousParameter
@@ -14,7 +16,7 @@ import pickle
 
 if __name__ == '__main__':
 
-    train = True
+    train = False
     if train:
         space = ParameterSpace([ContinuousParameter('traffic_light_1', 1, 4),
                                         ContinuousParameter('traffic_light_2', 1, 4),
@@ -23,20 +25,20 @@ if __name__ == '__main__':
                                         ContinuousParameter('trucks', 1, 1),
                                         ContinuousParameter('cars', 1, 2),
                                         ContinuousParameter('bikes', 1, 1),
-                                        ContinuousParameter('Heaviness',0,1),
+                                        ContinuousParameter('Heaviness',0.1,1),
                                         ContinuousParameter('NB', 0.1, 0.5),
                                         ContinuousParameter('EB', 0.1, 0.5),
                                         ContinuousParameter('SB', 0.1, 0.5),
                                         ContinuousParameter('WB', 0.1, 0.5)
                                         ])
-        num_data_points = 30
+        num_data_points = 20
         f = runner.call_sim_parallel
         design = RandomDesign(space)
         X = design.get_samples(num_data_points)
         print(X)
         Y = np.array(runner.call_sim_parallel(X))
         print(Y)
-        kern = GPy.kern.RBF(21, lengthscale=0.08, variance=20)
+        kern = GPy.kern.RBF(12, lengthscale=0.8, variance=0.01)
         model_gpy = GPRegression(X,Y, kern, noise_var=1e-10)
         model_gpy.optimize()
         model_emukit = GPyModelWrapper(model_gpy)
@@ -46,11 +48,11 @@ if __name__ == '__main__':
                                                 model = model_emukit,
                                                 acquisition = model_variance,
                                                 update_interval = 1,
-                                                batch_size = 5)
+                                                batch_size = 20)
 
 
         # Run the loop
-        stopping_condition = FixedIterationsStoppingCondition(i_max = 250)
+        stopping_condition = FixedIterationsStoppingCondition(i_max = 3)
         expdesign_loop.run_loop(f, stopping_condition)
 
 
@@ -66,9 +68,9 @@ if __name__ == '__main__':
 
 
     #Get some sample vals for plotting how it does
-    #For all these, assume everything bar traffic light #1 is fixed, i.e.:
+    #For all these, assume everything bar traffic light #1 is fixed, i.e.
 
-    fixed_params = [3,3,3,0.5,0.5, 1, 2, 1, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3]
+    fixed_params = [3,3,3,1,1.5, 1, 0.5, 0.3, 0.3, 0.3, 0.3]
     #Then pick values for the 4 traffic light times:
     xs = []
     for i in range(1,44,1):
@@ -89,14 +91,32 @@ if __name__ == '__main__':
     predicted_y = np.array(predicted_y).flatten()
     print(predicted_y)
     predicted_std = np.array(predicted_std).flatten()
-    #real_ys = runner.call_sim_parallel(xs)
+    real_ys = runner.call_sim_parallel(xs)
 
     plt.title('Learning function sin(x) with Emukit')
     plt.xlabel('x')
     plt.ylabel('y', rotation=None)
     xs = list(map(lambda x: x/4, range(1,44,1)))
-    #plt.plot(xs, real_ys, c='r', )
+    plt.plot(xs, real_ys, c='r', )
     plt.plot(xs, predicted_y)
     plt.legend(['True function', 'Estimated function'], loc='lower right')
     plt.fill_between(xs, predicted_y - 2 * predicted_std, predicted_y + 2 * predicted_std, alpha=.5)
     plt.show()
+
+    # Load core elements for Bayesian optimization
+    expected_improvement = ExpectedImprovement(model=model_emukit)
+    optimizer = GradientAcquisitionOptimizer(space=parameter_space)
+    # Create the Bayesian optimization object
+    bayesopt_loop = BayesianOptimizationLoop(model=model_emukit,
+                                             space=parameter_space,
+                                             acquisition=expected_improvement,
+                                             batch_size=5)
+    # Run the loop and extract the optimum
+    # Run the loop until we either complete 10 steps or converge
+    stopping_condition = FixedIterationsStoppingCondition(i_max=10) | ConvergenceStoppingCondition(eps=0.01)
+
+    bayesopt_loop.run_loop(f, stopping_condition)
+        bo.run_optimization(partial_call, 10)
+
+        maximum = bo.loop_state.X[np.argmax(bo.loop_state.Y)]
+        return maximum

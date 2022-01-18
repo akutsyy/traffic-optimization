@@ -17,7 +17,7 @@ METRIC = 'meanSpeedRelative'
 GRIDLOCK_PENALTY = 0.1
 
 N_LIMIT = 3600
-N = 2000
+N = 1000
 
 NO_SIM = True  # skip re-simulating
 
@@ -39,6 +39,7 @@ def call_sim_parallel(dparams):
     pool = mp.Pool(len(dparams))
     calls = [(x, "number_" + str(i)) for i, x in enumerate(dparams)]
     out = pool.map(call_sim_zipped,calls)
+    pool.close()
     return np.array([[x] for x in out]) # Package into 2D array
 
 
@@ -64,7 +65,7 @@ def get_sum_stats(grid_pen, name, metric='meanSpeedRelative'):
     metric_out = np.average(df[metric])
     print(metric_out, " - ", grid_pen, " = ", metric_out - grid_pen)
 
-    return max(0, metric_out - grid_pen)
+    return metric_out
 
 
 def set_session():
@@ -118,65 +119,46 @@ def update_sumoconfig(name):
 
 def update_network(param_list, savename='test'):
     # Must have all routes flowing to stop it falling into just allowing the busiest lane to flow only.
-    if 0 in param_list[0:4]:
-        return False
-
-    # Mock param list:
-    try:
-        assert len(param_list) == 21
-    except:
-        print("PARAMLIST:", param_list)
-
-    """
-    Params 0 - 3 = Traffic light setups - ratio values (are normalised before use!)
-            Default phases are
-            0: N->S and S->N
-            1: E->W and W->E
-            2: N->E and S->W
-            3: W->N and E->S
-    Params 4, 5 = Sigma and tau - see Krauss Model -  https://sumo.dlr.de/docs/Definition_of_Vehicles%2C_Vehicle_Types%2C_and_Routes.html
-    Params 6, 7, 8 = Ratio of trucks (6) , cars (7) , bikes (8) (as whole-number ratios/parts).
-    Params 9 to 20 (including 20) are matrix of flow probabilities for each source->dest; skipping the leading diagonal.
-    Flow probability = probability of a vehicle being emitted in any one second, yields binomial -
-    see: https://sumo.dlr.de/docs/Simulation/Randomness.html#flows_with_a_random_number_of_vehicles
-    NB: Not modelled per lane so can have duplicate spawns of vehicle types; sumo handles these rare cases by dropping extra vehicles.
-        (NB in the xml files, SUMO uses 1=North 2=East 3=West 4=South)
-        9: N->E (i.e. 1->2) 10: N->S  11: N->W
-        12: E->N  13: E->S  14: E->W
-        15: S->N  16: S->E  17: S->W
-        18: W->N  19: W->E  20: W->S
-
-    """
+    """    space = ParameterSpace([ContinuousParameter('traffic_light_1', 1, 4),   0 
+                                        ContinuousParameter('traffic_light_2', 1, 4), 1
+                                        ContinuousParameter('traffic_light_3', 1, 4),2
+                                        ContinuousParameter('traffic_light_4', 1, 4),3
+                                        ContinuousParameter('trucks', 1, 1),4
+                                        ContinuousParameter('cars', 1, 2),5
+                                        ContinuousParameter('bikes', 1, 1),6
+                                        ContinuousParameter('heaviness',0,1),7
+                                        ContinuousParameter('NB', 0, 1),8
+                                        ContinuousParameter('EB', 0, 1),9
+                                        ContinuousParameter('SB', 0, 1),10
+                                        ContinuousParameter('WB', 0, 1) 11
+                                        ])
+                                        """
     # print(list(zip(param_list,range(0,len(param_list)))))
 
-    with open('./draft.rou.xml') as f:
+    with open(os.path.join(os.path.dirname(__file__), 'draft.rou.xml')) as f:
         root = ET.parse(f)
 
-        # Update probability of emissions ( = flow):
-        flowdown = min(N_LIMIT, int(N / sum(param_list[9:])))
+        heaviness = param_list[7] * N
+        traffs = param_list[4:7]
+        ps = param_list[8:]
+        normalised_traffs = list(x / sum(traffs) for x in traffs)
         for i, n in enumerate(root.iter('flow')):
-            # i is the index of the specific ((source,dest),vehicle). There are 3 vehicle types.
-            # k is the index into the parameters for the specific source->dest. These do not distinguish by vehicle,
-            # so there are a third of the overall number of flows (i). So i = 3k (trucks) or 3k + 1 (cars) or 3k+2 (bikes)
-            k = i // 3
+            source_direction = i // 9
 
-            # First arg - the overall flow (sum of all vehicle types) which should be assigned to the flow. This is what
-            # is passed in as a parameter for the specific flow - add 9 as this starts from index 9.
-            # Second arg - the ratio values for the three types of vehicle.
-            # Third arg - the ratio value for whichever of the vehicle types are currently being assigned - add 6 as this
-            # starts form index 6. i - 3k = 1 or 2 or 3 i.e. the vehicle type.
-            prob = get_props_from_total(param_list[9 + k], param_list[6:9], param_list[6 + i - (3 * k)])
-            n.set('probability', prob)
-            n.set('end', str(flowdown))
+            # 0: truck, east
+            # 1: truck, south
+            # 3: truck, west
+            # 4: car, east
+
+            # List of what probability to send E/S/W
+            normalised_flows = get_normalised_flows(source_direction, ps)
+
+            veh_prop = normalised_traffs[(i % 9) // 3]
+            n.set('probability', str(round(veh_prop * normalised_flows[i % 3], 5)))
+            n.set('end', str(heaviness))
             # print(9+k, prob, param_list[9+k],n.attrib)
-
-        # Set tau and sigma for all vTypes
-        # for vType in root.findall('vType'):
-        # print()
-        # vType.set('sigma',str(param_list[4]))
-        # vType.set('tau',str(param_list[5]))
-
-        root.write("./in_use_files/" + str(savename) + ".rou.xml")
+            # so truck_ps[0] is flow for any incoming edge, for the going NORTH
+    root.write("./in_use_files/" + str(savename) + ".rou.xml")
 
     # Update the traffic lights
     with open('./draft.net.xml') as f:
@@ -188,6 +170,11 @@ def update_network(param_list, savename='test'):
         root.write("./in_use_files/" + str(savename) + ".net.xml")
 
     return True
+
+def get_normalised_flows(excl, ps):
+    ps2 = list(ps)
+    del ps2[excl]
+    return list(x / sum(ps2) for x in ps2)
 
 
 # this is the main entry point of this script
